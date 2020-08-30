@@ -1,0 +1,32 @@
+.inline-display{
+    display: inline-block;
+}
+
+.question-choice-container{
+    margin-top: 14px;
+}
+
+.question-choice-container .question-choice-label{
+    position: relative;
+    padding-left: 34px;
+}
+
+.question-choice-container .question-choice-icon-group{
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.question-choice-container .question-choice-icon-group .question-choice-icon{
+    margin: 0 13px 0 3px;
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+}
+
+.question-choice-container .question-choice-icon-group .question-choice-option-textbox{
+    width: 50%;
+    min-width: 140px;
+    display: inline-block;
+    vertical-align: middle;
+}
+

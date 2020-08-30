@@ -1,0 +1,54 @@
+.action-button-group{
+    display: none;
+}
+.portlet .portlet-title{
+    height: 1rem;
+}
+.portlet-title:hover .action-button-group{
+    display: inline-block;
+}
+
+
+.mb-10{
+    margin-bottom: 10px;
+}
+
+.title-area{
+    max-height: 300px;
+}
+
+.response-area{
+    margin-bottom: 1rem;
+}
+
+.config-area{
+    margin-bottom: 1rem;
+}
+
+.area-separator{
+    margin-bottom: 1rem;
+    border-top: 1px solid lightgray;    
+}
+
+.react-datepicker {
+    font-size: 1.3rem !important;
+  }
+  .react-datepicker-wrapper{
+    width: 100%;
+  }
+  
+  .react-datepicker__current-month {
+    font-size: 1.5rem !important;
+  }
+  
+  .react-datepicker__header {
+    padding-top: 6px !important;
+  }
+  
+  .react-datepicker__navigation {
+    top: 13px !important;
+  }
+  
+  .react-datepicker__day-name, .react-datepicker__day {
+    margin: 0.5rem !important;
+  }
