@@ -7,33 +7,47 @@ import { EVALUATION } from '../../../interfaces/elements';
 
 interface TextTypeProps {
   textElement: EVALUATION.TextElement,
-  remove: Function,
-  onUpdateHandler: Function
+  onRemoveHandler: Function,
+  onUpdateHandler: Function,
+  onCopyHandler: Function,
+  onAlterOrderHandler: Function,
+  index: number  
 }
 
-const TextType: FC<TextTypeProps> = (props: TextTypeProps) => {
-  const [element, setElement] = useState<EVALUATION.TextElement>(props.textElement)
+const TextType: FC<TextTypeProps> = ({ textElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler, index }: TextTypeProps) => {
+  const [element, setElement] = useState<EVALUATION.TextElement>(textElement)
 
   useEffect(() => {
-    if (props.textElement) {
-      setElement(textElement => {
-        return textElement
-      });
+    if (textElement) {
+      setElement(textElement => textElement);
     }
-  }, [props.textElement])
+  }, [textElement])
+
+  useEffect(() =>{
+    setElement({...element, order: index})
+  },[index])
 
   useEffect(() => {
-    props.onUpdateHandler(element);
-  }, [element, props])
+    onUpdateHandler(element);
+  }, [element])
 
-  const alterOrder = (id: string, action: "up" | "down") => {
-    alert(`alterOrder => id:${id} ,order: ${action}`);
+  const alterOrder = (element: EVALUATION.TextElement, action: "up" | "down") => {
+    if (onAlterOrderHandler) {
+      onAlterOrderHandler(element, action);
+    }
   }
 
-  const copy = (id: string) => {
-    alert(`copy => id:${id}`);
+  const copy = (element: EVALUATION.TextElement) => {
+    if (onCopyHandler) {
+      onCopyHandler(element);
+    }
   }
 
+  const remove = (element: EVALUATION.TextElement) => {
+    if (onRemoveHandler) {
+      onRemoveHandler(element);
+    }
+  }
   return (
     <Fragment>
       <div className="container">
@@ -46,7 +60,7 @@ const TextType: FC<TextTypeProps> = (props: TextTypeProps) => {
                   type="button"
                   className="btn btn-link"
                   title="Mover elemento para uma posição anterior"
-                  onClick={() => { alterOrder(element.id, "up"); }}
+                  onClick={() => { alterOrder(element, "up"); }}
                 >
                   <FaArrowUp />
                 </button>
@@ -54,7 +68,7 @@ const TextType: FC<TextTypeProps> = (props: TextTypeProps) => {
                   type="button"
                   className="btn btn-link"
                   title="Mover elemento para uma posição posterior"
-                  onClick={() => { alterOrder(element.id, "down"); }}
+                  onClick={() => { alterOrder(element, "down"); }}
                 >
                   <FaArrowDown />
                 </button>
@@ -62,7 +76,7 @@ const TextType: FC<TextTypeProps> = (props: TextTypeProps) => {
                   type="button"
                   className="btn btn-link"
                   title="Copiar elemento"
-                  onClick={() => { copy(element.id); }}
+                  onClick={() => { copy(element); }}
                 >
                   <FaCopy />
                 </button>
@@ -70,7 +84,7 @@ const TextType: FC<TextTypeProps> = (props: TextTypeProps) => {
                   type="button"
                   className="btn btn-link"
                   title="Remover elemento"
-                  onClick={() => { props.remove(element.id); }}
+                  onClick={() => { remove(element); }}
                 ><FaTrash />
                 </button>
               </div>

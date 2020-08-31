@@ -6,11 +6,14 @@ import ImageElement from '../../general/ImageElement';
 import { EVALUATION } from '../../../interfaces/elements';
 
 interface NumberTypeProps {
-  numberElement: EVALUATION.NumberElement,
-  remove: Function,
+  numberElement: EVALUATION.NumberElement,  
+  onRemoveHandler: Function,
+  onUpdateHandler: Function,
+  onCopyHandler: Function,
+  onAlterOrderHandler: Function,
 }
 
-const TextType: FC<NumberTypeProps> = ({ numberElement, remove }: NumberTypeProps) => {
+const TextType: FC<NumberTypeProps> = ({ numberElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler }: NumberTypeProps) => {
   const [element, setElement] = useState<EVALUATION.NumberElement>(numberElement)
 
   useEffect(() => {
@@ -19,12 +22,26 @@ const TextType: FC<NumberTypeProps> = ({ numberElement, remove }: NumberTypeProp
     }
   }, [numberElement])
 
-  const alterOrder = (id: string, action: "up" | "down") => {
-    alert(`alterOrder => id:${id} ,order: ${action}`);
+  useEffect(() => {
+    onUpdateHandler(element);
+  }, [element])
+
+  const alterOrder = (element: EVALUATION.NumberElement, action: "up" | "down") => {
+    if (onAlterOrderHandler) {
+      onAlterOrderHandler(element, action);
+    }
   }
 
-  const copy = (id: string) => {
-    alert(`copy => id:${id}`);
+  const copy = (element: EVALUATION.NumberElement) => {
+    if (onCopyHandler) {
+      onCopyHandler(element);
+    }
+  }
+
+  const remove = (element: EVALUATION.NumberElement) => {
+    if (onRemoveHandler) {
+      onRemoveHandler(element);
+    }
   }
 
   return (
@@ -39,7 +56,7 @@ const TextType: FC<NumberTypeProps> = ({ numberElement, remove }: NumberTypeProp
                   type="button"
                   className="btn btn-link"
                   title="Mover elemento para uma posição anterior"
-                  onClick={() => { alterOrder(element.id, "up"); }}
+                  onClick={() => { alterOrder(element, "up"); }}
                 >
                   <FaArrowUp />
                 </button>
@@ -47,7 +64,7 @@ const TextType: FC<NumberTypeProps> = ({ numberElement, remove }: NumberTypeProp
                   type="button"
                   className="btn btn-link"
                   title="Mover elemento para uma posição posterior"
-                  onClick={() => { alterOrder(element.id, "down"); }}
+                  onClick={() => { alterOrder(element, "down"); }}
                 >
                   <FaArrowDown />
                 </button>
@@ -55,7 +72,7 @@ const TextType: FC<NumberTypeProps> = ({ numberElement, remove }: NumberTypeProp
                   type="button"
                   className="btn btn-link"
                   title="Copiar elemento"
-                  onClick={() => { copy(element.id); }}
+                  onClick={() => { copy(element); }}
                 >
                   <FaCopy />
                 </button>
@@ -63,7 +80,7 @@ const TextType: FC<NumberTypeProps> = ({ numberElement, remove }: NumberTypeProp
                   type="button"
                   className="btn btn-link"
                   title="Remover elemento"
-                  onClick={() => { remove(element.id); }}
+                  onClick={() => { remove(element); }}
                 ><FaTrash />
                 </button>
               </div>
@@ -110,7 +127,7 @@ const TextType: FC<NumberTypeProps> = ({ numberElement, remove }: NumberTypeProp
                 </div>
 
                 <div className="col-xs-12 col-sm-12 col-md-4 col-lg-4">
-                  <ImageElement />
+                  <ImageElement imgSrc={element.imagePath} onChange={((e:string) => {setElement({...element, imagePath: e})})} />
                 </div>
               </div>
             </div>

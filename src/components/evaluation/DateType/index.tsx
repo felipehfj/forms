@@ -13,13 +13,16 @@ import "react-datepicker/dist/react-datepicker.css";
 
 interface DateTypeProps {
   dateElement: EVALUATION.DateElement,
-  remove: Function,
+  onRemoveHandler: Function,
+  onUpdateHandler: Function,
+  onCopyHandler: Function,
+  onAlterOrderHandler: Function,
 }
 
 
 registerLocale('br', br);
 
-const TextType: FC<DateTypeProps> = ({ dateElement, remove }: DateTypeProps) => {
+const TextType: FC<DateTypeProps> = ({ dateElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler }: DateTypeProps) => {
   const [element, setElement] = useState<EVALUATION.DateElement>(dateElement)
 
   useEffect(() => {
@@ -28,12 +31,26 @@ const TextType: FC<DateTypeProps> = ({ dateElement, remove }: DateTypeProps) => 
     }
   }, [dateElement])
 
-  const alterOrder = (id: string, action: "up" | "down") => {
-    alert(`alterOrder => id:${id} ,order: ${action}`);
+  useEffect(() => {
+    onUpdateHandler(element);
+  }, [element])
+
+  const alterOrder = (element: EVALUATION.DateElement, action: "up" | "down") => {
+    if (onAlterOrderHandler) {
+      onAlterOrderHandler(element, action);
+    }
   }
 
-  const copy = (id: string) => {
-    alert(`copy => id:${id}`);
+  const copy = (element: EVALUATION.DateElement) => {
+    if (onCopyHandler) {
+      onCopyHandler(element);
+    }
+  }
+
+  const remove = (element: EVALUATION.DateElement) =>{
+    if(onRemoveHandler){
+      onRemoveHandler(element);
+    }
   }
 
   function formatDate(date: string){
@@ -56,7 +73,7 @@ const TextType: FC<DateTypeProps> = ({ dateElement, remove }: DateTypeProps) => 
                   type="button"
                   className="btn btn-link"
                   title="Mover elemento para uma posição anterior"
-                  onClick={() => { alterOrder(element.id, "up"); }}
+                  onClick={() => { alterOrder(element, "up"); }}
                 >
                   <FaArrowUp />
                 </button>
@@ -64,7 +81,7 @@ const TextType: FC<DateTypeProps> = ({ dateElement, remove }: DateTypeProps) => 
                   type="button"
                   className="btn btn-link"
                   title="Mover elemento para uma posição posterior"
-                  onClick={() => { alterOrder(element.id, "down"); }}
+                  onClick={() => { alterOrder(element, "down"); }}
                 >
                   <FaArrowDown />
                 </button>
@@ -72,7 +89,7 @@ const TextType: FC<DateTypeProps> = ({ dateElement, remove }: DateTypeProps) => 
                   type="button"
                   className="btn btn-link"
                   title="Copiar elemento"
-                  onClick={() => { copy(element.id); }}
+                  onClick={() => { copy(element); }}
                 >
                   <FaCopy />
                 </button>
@@ -80,7 +97,7 @@ const TextType: FC<DateTypeProps> = ({ dateElement, remove }: DateTypeProps) => 
                   type="button"
                   className="btn btn-link"
                   title="Remover elemento"
-                  onClick={() => { remove(element.id); }}
+                  onClick={() => { remove(element); }}
                 ><FaTrash />
                 </button>
               </div>
@@ -127,7 +144,7 @@ const TextType: FC<DateTypeProps> = ({ dateElement, remove }: DateTypeProps) => 
                 </div>
 
                 <div className="col-xs-12 col-sm-12 col-md-4 col-lg-4">
-                  <ImageElement />
+                  <ImageElement imgSrc={element.imagePath} onChange={((e:string) => {setElement({...element, imagePath: e})})} />
                 </div>
               </div>
             </div>

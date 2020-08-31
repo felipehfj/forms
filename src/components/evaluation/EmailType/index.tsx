@@ -7,10 +7,13 @@ import { EVALUATION } from '../../../interfaces/elements';
 
 interface EmailTypeProps {
   emailElement: EVALUATION.EmailElement,
-  remove: Function,
+  onRemoveHandler: Function,
+  onUpdateHandler: Function,
+  onCopyHandler: Function,
+  onAlterOrderHandler: Function,
 }
 
-const TextType: FC<EmailTypeProps> = ({ emailElement, remove }: EmailTypeProps) => {
+const EmailType: FC<EmailTypeProps> = ({ emailElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler }: EmailTypeProps) => {
   const [element, setElement] = useState<EVALUATION.EmailElement>(emailElement)
 
   useEffect(() => {
@@ -19,12 +22,26 @@ const TextType: FC<EmailTypeProps> = ({ emailElement, remove }: EmailTypeProps) 
     }
   }, [emailElement])
 
-  const alterOrder = (id: string, action: "up" | "down") => {
-    alert(`alterOrder => id:${id} ,order: ${action}`);
+  useEffect(() => {
+    onUpdateHandler(element);
+  }, [element])
+
+  const alterOrder = (element: EVALUATION.EmailElement, action: "up" | "down") => {
+    if (onAlterOrderHandler) {
+      onAlterOrderHandler(element, action);
+    }
   }
 
-  const copy = (id: string) => {
-    alert(`copy => id:${id}`);
+  const copy = (element: EVALUATION.EmailElement) => {
+    if (onCopyHandler) {
+      onCopyHandler(element);
+    }
+  }
+
+  const remove = (element: EVALUATION.EmailElement) =>{
+    if(onRemoveHandler){
+      onRemoveHandler(element);
+    }
   }
 
   return (
@@ -39,7 +56,7 @@ const TextType: FC<EmailTypeProps> = ({ emailElement, remove }: EmailTypeProps) 
                   type="button"
                   className="btn btn-link"
                   title="Mover elemento para uma posição anterior"
-                  onClick={() => { alterOrder(element.id, "up"); }}
+                  onClick={() => { alterOrder(element, "up"); }}
                 >
                   <FaArrowUp />
                 </button>
@@ -47,7 +64,7 @@ const TextType: FC<EmailTypeProps> = ({ emailElement, remove }: EmailTypeProps) 
                   type="button"
                   className="btn btn-link"
                   title="Mover elemento para uma posição posterior"
-                  onClick={() => { alterOrder(element.id, "down"); }}
+                  onClick={() => { alterOrder(element, "down"); }}
                 >
                   <FaArrowDown />
                 </button>
@@ -55,7 +72,7 @@ const TextType: FC<EmailTypeProps> = ({ emailElement, remove }: EmailTypeProps) 
                   type="button"
                   className="btn btn-link"
                   title="Copiar elemento"
-                  onClick={() => { copy(element.id); }}
+                  onClick={() => { copy(element); }}
                 >
                   <FaCopy />
                 </button>
@@ -63,7 +80,7 @@ const TextType: FC<EmailTypeProps> = ({ emailElement, remove }: EmailTypeProps) 
                   type="button"
                   className="btn btn-link"
                   title="Remover elemento"
-                  onClick={() => { remove(element.id); }}
+                  onClick={() => { remove(element); }}
                 ><FaTrash />
                 </button>
               </div>
@@ -110,7 +127,7 @@ const TextType: FC<EmailTypeProps> = ({ emailElement, remove }: EmailTypeProps) 
                 </div>
 
                 <div className="col-xs-12 col-sm-12 col-md-4 col-lg-4">
-                  <ImageElement />
+                  <ImageElement imgSrc={element.imagePath} onChange={((e:string) => {setElement({...element, imagePath: e})})} />
                 </div>
               </div>
             </div>
@@ -121,12 +138,12 @@ const TextType: FC<EmailTypeProps> = ({ emailElement, remove }: EmailTypeProps) 
                   <div className="form-group">
 
                     <input
-                      type="email"                      
+                      type="email"
                       style={{ width: '100%', resize: 'none', padding: '2rem' }}
                       name="response"
-                      value={element.response}                      
+                      value={element.response}
                       className="form-control"
-                      placeholder="Insira a sua resposta"                      
+                      placeholder="Insira a sua resposta"
                       onChange={e => {
                         const { name, value } = e.target;
                         setElement({ ...element, [name]: value })
@@ -161,17 +178,13 @@ const TextType: FC<EmailTypeProps> = ({ emailElement, remove }: EmailTypeProps) 
                     />
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
-
-          <div>{JSON.stringify(element, null, 2)}</div>
-
         </div>
       </div>
     </Fragment>
   );
 }
 
-export default TextType;
+export default EmailType;

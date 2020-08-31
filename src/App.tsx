@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { generate } from "shortid";
 import TextType from "./components/evaluation/TextType";
 import ParagraphType from "./components/evaluation/ParagraphType";
@@ -9,124 +9,21 @@ import DateType from "./components/evaluation/DateType";
 import { EVALUATION } from './interfaces/elements';
 import SelectType from "./components/evaluation/SelectType";
 import { produce } from "immer";
+import ElementButtonBar from "./components/general/ElementButtonBar";
 
-const App: React.FC = () => {
+const App: React.FC = () => {  
+  const [elements, setElements] = useState<Array<EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement>>([]);
 
-  const [orderCount, setOrderCount] = useState(1);
-  const [elements, setElements] = useState<Array<EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement>>([
-    // { id: generate(), order: 1, type: "text", title: "", subtitle: "", imagePath: "", required: true, response: "" },
-    // { id: generate(), order: 2, type: "number", title: "", subtitle: "", imagePath: "", required: true, response: "" },
-    // { id: generate(), order: 3, type: "paragraph", title: "", subtitle: "", imagePath: "", required: true, response: "" },
-    // { id: generate(), order: 4, type: "email", title: "", subtitle: "", imagePath: "", required: true, response: "" },
-    // { id: generate(), order: 5, type: "date", title: "", subtitle: "", imagePath: "", required: true, response: "10/06/1983" },
-    // { id: generate(), order: 6, type: "select", title: "", subtitle: "", imagePath: "", required: true, response: "", options: [{ id: generate(), value: 'teste' }] }
-  ]);
 
-  const fn = {
-    addElement: (type: string) => {
-      setOrderCount(order => order + 1);
-
-      switch (type) {
-        case "text":
-          setElements(elements =>
-            produce(elements, draft => {
-              draft.push({
-                id: generate(),
-                order: orderCount,
-                required: true,
-                title: "",
-                type: "text",
-                imagePath: "",
-                response: "",
-                subtitle: ""
-              });
-            }));
-          break;
-        case "number":
-          setElements(elements =>
-            produce(elements, draft => {
-              draft.push({
-                id: generate(),
-                order: orderCount,
-                required: true,
-                title: "",
-                type: "number",
-                imagePath: "",
-                response: "",
-                subtitle: ""
-              });
-            }));
-          break;
-        case "paragraph":
-          setElements(elements =>
-            produce(elements, draft => {
-              draft.push({
-                id: generate(),
-                order: orderCount,
-                required: true,
-                title: "",
-                type: "paragraph",
-                imagePath: "",
-                response: "",
-                subtitle: ""
-              });
-            }));
-          break;
-        case "date":
-          setElements(elements =>
-            produce(elements, draft => {
-              draft.push({
-                id: generate(),
-                order: orderCount,
-                required: true,
-                title: "",
-                type: "date",
-                imagePath: "",
-                response: "",
-                subtitle: ""
-              });
-            }));
-          break;
-        case "select":
-          setElements(elements =>
-            produce(elements, draft => {
-              draft.push({
-                id: generate(),
-                order: orderCount,
-                required: true,
-                title: "",
-                type: "select",
-                imagePath: "",
-                response: "",
-                subtitle: "",
-                options: []
-              });
-            }));
-          break;
-        default:
-          break;
-      }
-    },
-    removeElement: (element: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement) => {
-      setElements(currentElement =>
-        currentElement.filter(x => x.id !== element.id)
-      );
-    },
-    orderElement: (element: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement, type: "up"|"down") =>{ 
-
-    }
-  }
-
-  const addElement = (type: string) => {
-    setOrderCount(order => order + 1);
-
+  const addElement = (type: string) => {    
+    const orderCount = elements.length+1;
     switch (type) {
       case "text":
         setElements(elements =>
           produce(elements, draft => {
             draft.push({
-              id: generate(),
-              order: orderCount,
+              id: generate(),    
+              order: orderCount,          
               required: true,
               title: "",
               type: "text",
@@ -145,6 +42,21 @@ const App: React.FC = () => {
               required: true,
               title: "",
               type: "number",
+              imagePath: "",
+              response: "",
+              subtitle: ""
+            });
+          }));
+        break;
+      case "email":
+        setElements(elements =>
+          produce(elements, draft => {
+            draft.push({
+              id: generate(),
+              order: orderCount,
+              required: true,
+              title: "",
+              type: "email",
               imagePath: "",
               response: "",
               subtitle: ""
@@ -202,12 +114,11 @@ const App: React.FC = () => {
     }
   };
 
-  const removeElement = (element: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement) => {
+  const handleRemove = (element: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement) => {
     setElements(currentElement =>
       currentElement.filter(x => x.id !== element.id)
     );
   };
-
 
   function handleUpdate(e: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement) {
     let atual = elements.find(c => c.id === e.id);
@@ -217,44 +128,52 @@ const App: React.FC = () => {
         v[idxAtual] = e;
       }))
     }
-    console.log(e);
+  }  
+
+  function handleAlterOrder(e: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement, type: "up" | "down") {
+    let idx = elements.indexOf(e);
+
+    if (idx > -1) {
+      if (type === 'up') {
+        if (idx === 0) {
+          return;
+        } else {
+          let anterior = elements[idx - 1];
+          setElements(elements => produce(elements, draft => {
+            draft[idx - 1] = e;
+            draft[idx] = anterior;
+          }))
+        }
+      }
+
+      if (type === 'down') {
+        if (idx === elements.length - 1) {
+          return;
+        } else {
+          let posterior = elements[idx + 1];
+          setElements(elements => produce(elements, draft => {
+            draft[idx + 1] = e;
+            draft[idx] = posterior;
+          }))
+        }
+      }
+    }
   }
 
+  function handleCopy(e: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement) {
+    let idx = elements.indexOf(e);
 
+    if (idx > -1) {
+      setElements(elements => produce(elements, draft => {
+        draft.splice(idx, 0, { ...e, id: generate(), imagePath: '' });
+      }))
+    }
+  }
 
   return (
     <div style={{ textAlign: "center" }}>
 
-      <button
-        onClick={() => addElement('text')}
-      >
-        text
-      </button>
-      <button
-        onClick={() => addElement('paragraph')}
-      >
-        paragraph
-      </button>
-      <button
-        onClick={() => addElement('date')}
-      >
-        date
-      </button>
-      <button
-        onClick={() => addElement('number')}
-      >
-        number
-      </button>
-      <button
-        onClick={() => addElement('email')}
-      >
-        email
-      </button>
-      <button
-        onClick={() => addElement('select')}
-      >
-        select
-      </button>
+      <ElementButtonBar addElement={addElement} />
 
       <div>{JSON.stringify(elements, null, 2)}</div>
 
@@ -265,8 +184,11 @@ const App: React.FC = () => {
               <div key={p.id}>
                 <TextType
                   textElement={p}
-                  remove={() => removeElement(p)}
+                  onRemoveHandler={handleRemove}
                   onUpdateHandler={handleUpdate}
+                  onAlterOrderHandler={handleAlterOrder}
+                  onCopyHandler={handleCopy}  
+                  index={index}                
                 />
               </div>
             );
@@ -275,7 +197,10 @@ const App: React.FC = () => {
               <div key={p.id}>
                 <NumberType
                   numberElement={p}
-                  remove={() => removeElement(p)}
+                  onRemoveHandler={handleRemove}
+                  onUpdateHandler={handleUpdate}
+                  onAlterOrderHandler={handleAlterOrder}
+                  onCopyHandler={handleCopy}
                 />
               </div>
             );
@@ -284,7 +209,10 @@ const App: React.FC = () => {
               <div key={p.id}>
                 <EmailType
                   emailElement={p}
-                  remove={() => removeElement(p)}
+                  onRemoveHandler={handleRemove}
+                  onUpdateHandler={handleUpdate}
+                  onAlterOrderHandler={handleAlterOrder}
+                  onCopyHandler={handleCopy}
                 />
               </div>
             );
@@ -293,7 +221,10 @@ const App: React.FC = () => {
               <div key={p.id}>
                 <DateType
                   dateElement={p}
-                  remove={() => removeElement(p)}
+                  onRemoveHandler={handleRemove}
+                  onUpdateHandler={handleUpdate}
+                  onAlterOrderHandler={handleAlterOrder}
+                  onCopyHandler={handleCopy}
                 />
               </div>
             );
@@ -302,7 +233,10 @@ const App: React.FC = () => {
               <div key={p.id}>
                 <ParagraphType
                   paragraphElement={p}
-                  remove={() => removeElement(p)}
+                  onRemoveHandler={handleRemove}
+                  onUpdateHandler={handleUpdate}
+                  onAlterOrderHandler={handleAlterOrder}
+                  onCopyHandler={handleCopy}
                 />
               </div>
             );
@@ -311,8 +245,10 @@ const App: React.FC = () => {
               <div key={p.id}>
                 <SelectType
                   selectElement={p}
-                  remove={() => removeElement(p)}
+                  onRemoveHandler={handleRemove}
                   onUpdateHandler={handleUpdate}
+                  onAlterOrderHandler={handleAlterOrder}
+                  onCopyHandler={handleCopy}
                 />
               </div>
             );

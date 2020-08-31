@@ -20,15 +20,15 @@ const customStyles = {
         bottom: 'auto',
         marginRight: '-50%',
         transform: 'translate(-50%, -50%)',
-        // minWidth: '200px',
-        // minHeight: '200px'
+        minWidth: '400px',
+        minHeight: '400px'
     }
 };
 
 const ImageElement: FC<ImageElement> = (props: ImageElement) => {
     const [show, setShow] = useState(false);
     const [picture, setPicture] = useState<File[]>([]);
-    const [pictureUrl, setPictureUrl] = useState<string>("");
+    const [pictureUrl, setPictureUrl] = useState<string>("");    
 
     useEffect(() => {
         if (picture && picture.length > 0) {
@@ -50,7 +50,6 @@ const ImageElement: FC<ImageElement> = (props: ImageElement) => {
         }
     }, [pictureUrl])
 
-
     const showModal = () => {
         setShow(show => true)
     }
@@ -59,11 +58,10 @@ const ImageElement: FC<ImageElement> = (props: ImageElement) => {
         setShow(show => false)
     }
 
-    const onDrop = (picture: File[]) => {
-        console.log(picture);
+    const onDrop = (picture: File[]) => {        
         setPicture(picture);
-
     }
+
     const removeImage = () => {
         setPictureUrl(url => "");
         setPicture([]);
@@ -103,7 +101,7 @@ const ImageElement: FC<ImageElement> = (props: ImageElement) => {
                     label="Tamanho máximo permitido: 5MB."
                     fileContainerStyle={{ maxWidth: '300px', maxHeight: '300px' }}
                 />
-                <button type="button">ok</button>
+                <button type="button" onClick={closeModal}>ok</button>
                 {JSON.stringify(pictureUrl, null, 2)}
             </Modal>
         </Fragment>

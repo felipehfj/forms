@@ -11,31 +11,25 @@ import { generate } from 'shortid';
 
 interface SelectTypeProps {
   selectElement: EVALUATION.SelectElement,
-  remove: Function,
-  onUpdateHandler: Function
+  onRemoveHandler: Function,
+  onUpdateHandler: Function,
+  onCopyHandler: Function,
+  onAlterOrderHandler: Function,
 }
 
-const SelectType: FC<SelectTypeProps> = (props: SelectTypeProps) => {
-  const [element, setElement] = useState<EVALUATION.SelectElement>(props.selectElement)
+const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler }: SelectTypeProps) => {
+  const [element, setElement] = useState<EVALUATION.SelectElement>(selectElement)
   const [options, setOptions] = useState<Array<EVALUATION.SelectOptions>>(element.options);
 
   useEffect(() => {
-    if (props.selectElement) {
+    if (selectElement) {
       setElement(selectElement => selectElement);
     }
-  }, [props.selectElement])
+  }, [selectElement])
 
   useEffect(() => {
-    props.onUpdateHandler(element);
-  }, [element, props])
-
-  const alterOrder = (id: string, action: "up" | "down") => {
-    alert(`alterOrder => id:${id} ,order: ${action}`);
-  }
-
-  const copy = (id: string) => {
-    alert(`copy => id:${id}`);
-  }
+    onUpdateHandler(element);
+  }, [element])
 
   useEffect(() => {
     setElement({ ...element, options: options })
@@ -57,6 +51,29 @@ const SelectType: FC<SelectTypeProps> = (props: SelectTypeProps) => {
     );
   };
 
+
+  useEffect(() => {
+    onUpdateHandler(element);
+  }, [element])
+
+  const alterOrder = (element: EVALUATION.SelectElement, action: "up" | "down") => {
+    if (onAlterOrderHandler) {
+      onAlterOrderHandler(element, action);
+    }
+  }
+
+  const copy = (element: EVALUATION.SelectElement) => {
+    if (onCopyHandler) {
+      onCopyHandler(element);
+    }
+  }
+
+  const remove = (element: EVALUATION.SelectElement) => {
+    if (onRemoveHandler) {
+      onRemoveHandler(element);
+    }
+  }
+
   return (
     <Fragment>
       <div className="container">
@@ -69,7 +86,7 @@ const SelectType: FC<SelectTypeProps> = (props: SelectTypeProps) => {
                   type="button"
                   className="btn btn-link"
                   title="Mover elemento para uma posição anterior"
-                  onClick={() => { alterOrder(element.id, "up"); }}
+                  onClick={() => { alterOrder(element, "up"); }}
                 >
                   <FaArrowUp />
                 </button>
@@ -77,7 +94,7 @@ const SelectType: FC<SelectTypeProps> = (props: SelectTypeProps) => {
                   type="button"
                   className="btn btn-link"
                   title="Mover elemento para uma posição posterior"
-                  onClick={() => { alterOrder(element.id, "down"); }}
+                  onClick={() => { alterOrder(element, "down"); }}
                 >
                   <FaArrowDown />
                 </button>
@@ -85,7 +102,7 @@ const SelectType: FC<SelectTypeProps> = (props: SelectTypeProps) => {
                   type="button"
                   className="btn btn-link"
                   title="Copiar elemento"
-                  onClick={() => { copy(element.id); }}
+                  onClick={() => { copy(element); }}
                 >
                   <FaCopy />
                 </button>
@@ -93,7 +110,7 @@ const SelectType: FC<SelectTypeProps> = (props: SelectTypeProps) => {
                   type="button"
                   className="btn btn-link"
                   title="Remover elemento"
-                  onClick={() => { props.remove(element.id); }}
+                  onClick={() => { remove(element); }}
                 ><FaTrash />
                 </button>
               </div>
@@ -139,7 +156,7 @@ const SelectType: FC<SelectTypeProps> = (props: SelectTypeProps) => {
                 </div>
 
                 <div className="col-xs-12 col-sm-12 col-md-4 col-lg-4">
-                  <ImageElement />
+                  <ImageElement imgSrc={element.imagePath} onChange={((e:string) => {setElement({...element, imagePath: e})})} />
                 </div>
               </div>
             </div>
