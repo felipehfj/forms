@@ -1,6 +1,7 @@
 interface IOption{
   id: string,
-  value: string
+  name: string,
+  value: string,
 }
 
 interface SelectOptions extends IOption {
@@ -18,6 +19,7 @@ interface IElement {
   imagePath?: string,
   required: boolean,
   response?: string,
+  options?:Array<MultipleOptions|SelectOptions>
 }
 
 export declare namespace EVALUATION {
@@ -50,11 +52,12 @@ export declare namespace EVALUATION {
     type: "multiple",
     options: Array<MultipleOptions>,
   }
-
+  
   interface SelectOptions extends IOption {
   }
   
   interface MultipleOptions extends IOption {
   }
+  
 }
 

@@ -17,12 +17,13 @@ interface DateTypeProps {
   onUpdateHandler: Function,
   onCopyHandler: Function,
   onAlterOrderHandler: Function,
+  index:number
 }
 
 
 registerLocale('br', br);
 
-const TextType: FC<DateTypeProps> = ({ dateElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler }: DateTypeProps) => {
+const TextType: FC<DateTypeProps> = ({ dateElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler, index }: DateTypeProps) => {
   const [element, setElement] = useState<EVALUATION.DateElement>(dateElement)
 
   useEffect(() => {
@@ -34,6 +35,10 @@ const TextType: FC<DateTypeProps> = ({ dateElement, onRemoveHandler, onAlterOrde
   useEffect(() => {
     onUpdateHandler(element);
   }, [element])
+
+  useEffect(() =>{
+    setElement({...element, order: index})
+  },[index])
 
   const alterOrder = (element: EVALUATION.DateElement, action: "up" | "down") => {
     if (onAlterOrderHandler) {

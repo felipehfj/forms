@@ -11,9 +11,10 @@ interface ParagraphTypeProps {
   onUpdateHandler: Function,
   onCopyHandler: Function,
   onAlterOrderHandler: Function,
+  index: number
 }
 
-const TextType: FC<ParagraphTypeProps> = ({ paragraphElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler }: ParagraphTypeProps) => {
+const TextType: FC<ParagraphTypeProps> = ({ paragraphElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler, index }: ParagraphTypeProps) => {
   const [element, setElement] = useState<EVALUATION.ParagraphElement>(paragraphElement)
 
   useEffect(() => {
@@ -21,6 +22,10 @@ const TextType: FC<ParagraphTypeProps> = ({ paragraphElement, onRemoveHandler, o
       setElement(paragraphElement => paragraphElement);
     }
   }, [paragraphElement])
+
+  useEffect(() =>{
+    setElement({...element, order: index})
+  },[index])
 
   useEffect(() => {
     onUpdateHandler(element);

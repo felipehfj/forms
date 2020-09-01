@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { FC, useState } from "react";
 import { generate } from "shortid";
 import TextType from "./components/evaluation/TextType";
 import ParagraphType from "./components/evaluation/ParagraphType";
@@ -11,19 +11,21 @@ import SelectType from "./components/evaluation/SelectType";
 import { produce } from "immer";
 import ElementButtonBar from "./components/general/ElementButtonBar";
 
-const App: React.FC = () => {  
-  const [elements, setElements] = useState<Array<EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement>>([]);
+const App: FC = () => {
+  const [elements, setElements] = useState<Array<EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement>>([
+    { id: 'aabbccddee', order: 0, type: 'select', options: [{ id: generate(), name: 'aabbccddee', value: 'teste' }], title: 'Seleção', required: false }
+  ]);
 
 
-  const addElement = (type: string) => {    
-    const orderCount = elements.length+1;
+  const addElement = (type: string) => {
+    let orderCount = elements.length;
     switch (type) {
       case "text":
         setElements(elements =>
           produce(elements, draft => {
             draft.push({
-              id: generate(),    
-              order: orderCount,          
+              id: generate(),
+              order: orderCount,
               required: true,
               title: "",
               type: "text",
@@ -128,7 +130,7 @@ const App: React.FC = () => {
         v[idxAtual] = e;
       }))
     }
-  }  
+  }
 
   function handleAlterOrder(e: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement, type: "up" | "down") {
     let idx = elements.indexOf(e);
@@ -161,11 +163,19 @@ const App: React.FC = () => {
   }
 
   function handleCopy(e: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement) {
-    let idx = elements.indexOf(e);
+    let idx = elements.indexOf(e);    
 
     if (idx > -1) {
       setElements(elements => produce(elements, draft => {
-        draft.splice(idx, 0, { ...e, id: generate(), imagePath: '' });
+        let genId = generate();
+        if(e.options){
+          let opt: Array<EVALUATION.MultipleOptions|EVALUATION.SelectOptions> = [];
+          e.options.every(item => opt.push({...item, name: genId}));
+          
+          draft.splice(idx, 0, { ...e, id: genId, imagePath: '', options: opt });
+        }else{
+          draft.splice(idx, 0, { ...e, id: genId, imagePath: ''});
+        }        
       }))
     }
   }
@@ -187,8 +197,8 @@ const App: React.FC = () => {
                   onRemoveHandler={handleRemove}
                   onUpdateHandler={handleUpdate}
                   onAlterOrderHandler={handleAlterOrder}
-                  onCopyHandler={handleCopy}  
-                  index={index}                
+                  onCopyHandler={handleCopy}
+                  index={index}
                 />
               </div>
             );
@@ -201,6 +211,7 @@ const App: React.FC = () => {
                   onUpdateHandler={handleUpdate}
                   onAlterOrderHandler={handleAlterOrder}
                   onCopyHandler={handleCopy}
+                  index={index}
                 />
               </div>
             );
@@ -213,6 +224,7 @@ const App: React.FC = () => {
                   onUpdateHandler={handleUpdate}
                   onAlterOrderHandler={handleAlterOrder}
                   onCopyHandler={handleCopy}
+                  index={index}
                 />
               </div>
             );
@@ -225,6 +237,7 @@ const App: React.FC = () => {
                   onUpdateHandler={handleUpdate}
                   onAlterOrderHandler={handleAlterOrder}
                   onCopyHandler={handleCopy}
+                  index={index}
                 />
               </div>
             );
@@ -237,6 +250,7 @@ const App: React.FC = () => {
                   onUpdateHandler={handleUpdate}
                   onAlterOrderHandler={handleAlterOrder}
                   onCopyHandler={handleCopy}
+                  index={index}
                 />
               </div>
             );
@@ -249,6 +263,7 @@ const App: React.FC = () => {
                   onUpdateHandler={handleUpdate}
                   onAlterOrderHandler={handleAlterOrder}
                   onCopyHandler={handleCopy}
+                  index={index}
                 />
               </div>
             );

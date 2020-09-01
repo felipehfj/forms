@@ -15,12 +15,12 @@ interface SelectTypeProps {
   onUpdateHandler: Function,
   onCopyHandler: Function,
   onAlterOrderHandler: Function,
+  index: number,
 }
 
-const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler }: SelectTypeProps) => {
+const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler, index }: SelectTypeProps) => {
   const [element, setElement] = useState<EVALUATION.SelectElement>(selectElement)
-  const [options, setOptions] = useState<Array<EVALUATION.SelectOptions>>(element.options);
-
+  
   useEffect(() => {
     if (selectElement) {
       setElement(selectElement => selectElement);
@@ -32,23 +32,21 @@ const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlt
   }, [element])
 
   useEffect(() => {
-    setElement({ ...element, options: options })
-  }, [options])
+    setElement({ ...element, order: index })
+  }, [index])
 
   const addOption = () => {
-    setOptions(currentOption => [
-      ...currentOption,
-      {
-        id: generate(),
-        value: ''
-      }
-    ]);
+    setElement(element => produce(element, draft => {
+      draft.options.push({ id: generate(), name: element.id, value: "" });
+    }))
   }
 
   const removeOption = (option: EVALUATION.SelectOptions) => {
-    setOptions(currentOption =>
-      currentOption.filter(x => x.id !== option.id)
-    );
+    setElement(element =>
+      produce(element, draft=>{
+        draft.options = draft.options.filter(x => x.id !== option.id)
+      }      
+    ));
   };
 
 
@@ -70,7 +68,7 @@ const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlt
 
   const remove = (element: EVALUATION.SelectElement) => {
     if (onRemoveHandler) {
-      onRemoveHandler(element);
+      onRemoveHandler(element);      
     }
   }
 
@@ -156,7 +154,7 @@ const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlt
                 </div>
 
                 <div className="col-xs-12 col-sm-12 col-md-4 col-lg-4">
-                  <ImageElement imgSrc={element.imagePath} onChange={((e:string) => {setElement({...element, imagePath: e})})} />
+                  <ImageElement imgSrc={element.imagePath} onChange={((e: string) => { setElement({ ...element, imagePath: e }) })} />
                 </div>
               </div>
             </div>
@@ -165,41 +163,17 @@ const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlt
               <div className="row">
                 <div className="col-xs-12" >
                   <div className="form-group">
-
-
                     {
-                      options.map((item, index) => (
-                        <div key={item.id} >
-                          <div className="col-md-2">
-                            <input
-                              className="form-control"
-                              type="radio"
-                              name="response"
-                              disabled
-                              value={item.value}
-                              onChange={e => {
-                                const { name, value } = e.target;
-                                setElement({ ...element, [name]: value })
-                              }
-                              }
-                            /></div>
-                          <div className="col-md-8">
-                            <input
-                              type="text"
-                              className="form-control"
-                              name="response"
-                              value={item.value} onChange={(e) => {
-                                const { value } = e.target;
-                                setOptions(current =>
-                                  produce(current, v => {
-                                    v[index].value = value;
-                                  }))
-                              }
-                              } />
-                          </div>
-                          <div className="col-md-2">
-                            <button type="button" onClick={() => removeOption(item)}>remove</button>
-                          </div>
+                      element.options.map((item, index) => (
+                        <div key={item.id} >                         
+                          <OptionElement
+                            index={index}
+                            onAlterOrderHandler={() => { }}
+                            onCopyHandler={() => { }}
+                            onRemoveHandler={() => { removeOption(item)}}
+                            onUpdateHandler={() => { }}
+                            optionElement={item}
+                          />
                         </div>
                       ))
                     }
@@ -239,7 +213,6 @@ const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlt
           </div>
 
           <div>{JSON.stringify(element, null, 2)}</div>
-          <OptionElement />
         </div>
       </div>
     </Fragment>

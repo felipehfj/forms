@@ -11,9 +11,10 @@ interface NumberTypeProps {
   onUpdateHandler: Function,
   onCopyHandler: Function,
   onAlterOrderHandler: Function,
+  index: number,
 }
 
-const TextType: FC<NumberTypeProps> = ({ numberElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler }: NumberTypeProps) => {
+const TextType: FC<NumberTypeProps> = ({ numberElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler, index }: NumberTypeProps) => {
   const [element, setElement] = useState<EVALUATION.NumberElement>(numberElement)
 
   useEffect(() => {
@@ -25,6 +26,10 @@ const TextType: FC<NumberTypeProps> = ({ numberElement, onRemoveHandler, onAlter
   useEffect(() => {
     onUpdateHandler(element);
   }, [element])
+
+  useEffect(() =>{
+    setElement({...element, order: index})
+  },[index])
 
   const alterOrder = (element: EVALUATION.NumberElement, action: "up" | "down") => {
     if (onAlterOrderHandler) {

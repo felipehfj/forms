@@ -11,9 +11,10 @@ interface EmailTypeProps {
   onUpdateHandler: Function,
   onCopyHandler: Function,
   onAlterOrderHandler: Function,
+  index: number,
 }
 
-const EmailType: FC<EmailTypeProps> = ({ emailElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler }: EmailTypeProps) => {
+const EmailType: FC<EmailTypeProps> = ({ emailElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler, index }: EmailTypeProps) => {
   const [element, setElement] = useState<EVALUATION.EmailElement>(emailElement)
 
   useEffect(() => {
@@ -25,6 +26,10 @@ const EmailType: FC<EmailTypeProps> = ({ emailElement, onRemoveHandler, onAlterO
   useEffect(() => {
     onUpdateHandler(element);
   }, [element])
+
+  useEffect(() =>{
+    setElement({...element, order: index})
+  },[index])
 
   const alterOrder = (element: EVALUATION.EmailElement, action: "up" | "down") => {
     if (onAlterOrderHandler) {
