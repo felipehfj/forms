@@ -146,8 +146,7 @@ const TextType: FC<TextTypeProps> = ({ textElement, onRemoveHandler, onAlterOrde
                       value={element.response}
                       maxLength={100}
                       className="form-control"
-                      placeholder="Insira a sua resposta"
-                      readOnly
+                      placeholder="Insira a sua resposta"                      
                       onChange={e => {
                         const { name, value } = e.target;
                         setElement({ ...element, [name]: value })
@@ -185,10 +184,7 @@ const TextType: FC<TextTypeProps> = ({ textElement, onRemoveHandler, onAlterOrde
 
               </div>
             </div>
-          </div>
-
-          <div>{JSON.stringify(element, null, 2)}</div>
-
+          </div>          
         </div>
       </div>
     </Fragment>

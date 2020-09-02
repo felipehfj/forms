@@ -1,0 +1,41 @@
+.inline-display{
+    display: inline-block;
+}
+
+.question-choice-container{
+    margin-top: 14px;
+    width: 100%;
+    text-align: start;
+}
+
+.question-choice-container .question-choice-label{
+    position: relative;
+    padding-left: 34px;
+}
+
+.question-choice-container .question-choice-icon-group{
+    display: inline-block;
+    vertical-align: middle;
+    margin: 10px 10px;
+}
+
+.question-choice-container .question-choice-icon{
+    margin: 0 13px 0 3px;
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+}
+
+.question-choice-container .question-choice-option-textbox{    
+    width: 50%;    
+    vertical-align: middle;
+}
+
+.question-choice-container .question-btn-container{
+    display: none;
+    padding-left: 10px;
+}
+
+.question-choice-container:hover .question-btn-container{
+    display: inline-block;
+}

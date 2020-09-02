@@ -6,14 +6,17 @@ import ParagraphType from "./components/evaluation/ParagraphType";
 import NumberType from "./components/evaluation/NumberType";
 import EmailType from "./components/evaluation/EmailType";
 import DateType from "./components/evaluation/DateType";
-import { EVALUATION } from './interfaces/elements';
+import MultipleType from "./components/evaluation/MultipleType";
 import SelectType from "./components/evaluation/SelectType";
+
+import { EVALUATION } from './interfaces/elements';
+
 import { produce } from "immer";
 import ElementButtonBar from "./components/general/ElementButtonBar";
 
 const App: FC = () => {
   const [elements, setElements] = useState<Array<EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement>>([
-    { id: 'aabbccddee', order: 0, type: 'select', options: [{ id: generate(), name: 'aabbccddee', value: 'teste' }], title: 'Seleção', required: false }
+    // { id: 'aabbccddee', order: 0, type: 'select', options: [{ id: generate(), name: 'aabbccddee', value: 'teste' }], title: 'Seleção', required: false }
   ]);
 
 
@@ -98,16 +101,35 @@ const App: FC = () => {
       case "select":
         setElements(elements =>
           produce(elements, draft => {
+            let id=generate()
             draft.push({
-              id: generate(),
+              id: id,
               order: orderCount,
               required: true,
               title: "",
               type: "select",
               imagePath: "",
-              response: "",
+              response: undefined,
               subtitle: "",
-              options: []
+              options: [{id:generate(), name:id, value:''},{id:generate(), name:id, value:"Outros"}]
+            });
+          }));
+        break;
+        case "multiple":
+        setElements(elements =>
+          produce(elements, draft => {
+            let id1=generate();
+            let id2=generate();
+            draft.push({
+              id: generate(),
+              order: orderCount,
+              required: true,
+              title: "",
+              type: "multiple",
+              imagePath: "",
+              response: [],
+              subtitle: "",
+              options: [{id:id1,name:id1, value:''},{id:id2,name:id2, value:"Outros"}]
             });
           }));
         break;
@@ -170,7 +192,10 @@ const App: FC = () => {
         let genId = generate();
         if(e.options){
           let opt: Array<EVALUATION.MultipleOptions|EVALUATION.SelectOptions> = [];
-          e.options.every(item => opt.push({...item, name: genId}));
+          
+          if(e.type==='select'){
+            e.options.every(item => opt.push({...item, name: genId}));
+          }          
           
           draft.splice(idx, 0, { ...e, id: genId, imagePath: '', options: opt });
         }else{
@@ -259,6 +284,19 @@ const App: FC = () => {
               <div key={p.id}>
                 <SelectType
                   selectElement={p}
+                  onRemoveHandler={handleRemove}
+                  onUpdateHandler={handleUpdate}
+                  onAlterOrderHandler={handleAlterOrder}
+                  onCopyHandler={handleCopy}
+                  index={index}
+                />
+              </div>
+            );
+            case 'multiple':
+            return (
+              <div key={p.id}>
+                <MultipleType
+                  multipleElement={p}
                   onRemoveHandler={handleRemove}
                   onUpdateHandler={handleUpdate}
                   onAlterOrderHandler={handleAlterOrder}

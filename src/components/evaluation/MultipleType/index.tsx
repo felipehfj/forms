@@ -4,13 +4,13 @@ import SliderSwitch from '../../general/SliderSwitch';
 import { FaArrowUp, FaArrowDown, FaTrash, FaCopy } from 'react-icons/fa';
 import './styles.css';
 import ImageElement from '../../general/ImageElement';
-import SelectOptionElement from '../../general/SelectOptionElement';
+import MultipleOptionElement from '../../general/MultipleOptionElement';
 
 import { EVALUATION } from '../../../interfaces/elements';
 import { generate } from 'shortid';
 
-interface SelectTypeProps {
-  selectElement: EVALUATION.SelectElement,
+interface MultipleTypeProps {
+  multipleElement: EVALUATION.MultipleElement,
   onRemoveHandler: Function,
   onUpdateHandler: Function,
   onCopyHandler: Function,
@@ -18,14 +18,14 @@ interface SelectTypeProps {
   index: number,
 }
 
-const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler, index }: SelectTypeProps) => {
-  const [element, setElement] = useState<EVALUATION.SelectElement>(selectElement)
+const MultipleType: FC<MultipleTypeProps> = ({ multipleElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler, index }: MultipleTypeProps) => {
+  const [element, setElement] = useState<EVALUATION.MultipleElement>(multipleElement)
 
   useEffect(() => {
-    if (selectElement) {
-      setElement(selectElement => selectElement);
+    if (multipleElement) {
+      setElement(multipleElement => multipleElement);
     }
-  }, [selectElement])
+  }, [multipleElement])
 
   useEffect(() => {
     onUpdateHandler(element);
@@ -37,19 +37,16 @@ const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlt
 
   const addOption = () => {
     setElement(element => produce(element, draft => {
-      draft.options.push({ id: generate(), name: element.id, value: "" });
+      let id = generate();
+      draft.options.push({ id: id, name:id, value: "" });
     }))
   }
 
-  const removeOption = (option: EVALUATION.SelectOptions) => {
+  const removeOption = (option: EVALUATION.MultipleOptions) => {
     setElement(element =>
       produce(element, draft => {
-        draft.options = draft.options.filter(x => x.id !== option.id)
-        if(draft.response){
-          if(draft.response.id === option.id){
-            draft.response=undefined;
-          }
-        }        
+        draft.options = draft.options.filter(x => x.id !== option.id);
+        draft.response = draft.options.filter(x => x.id !== option.id);
       }
       ));
   };
@@ -58,19 +55,19 @@ const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlt
     onUpdateHandler(element);
   }, [element])
 
-  const alterOrder = (element: EVALUATION.SelectElement, action: "up" | "down") => {
+  const alterOrder = (element: EVALUATION.MultipleElement, action: "up" | "down") => {
     if (onAlterOrderHandler) {
       onAlterOrderHandler(element, action);
     }
   }
 
-  const copy = (element: EVALUATION.SelectElement) => {
+  const copy = (element: EVALUATION.MultipleElement) => {
     if (onCopyHandler) {
       onCopyHandler(element);
     }
   }
 
-  const remove = (element: EVALUATION.SelectElement) => {
+  const remove = (element: EVALUATION.MultipleElement) => {
     if (onRemoveHandler) {
       onRemoveHandler(element);
     }
@@ -170,9 +167,9 @@ const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlt
                     {
                       element.options.map((item, index) => (
                         <div key={item.id} >
-                          <SelectOptionElement
+                          <MultipleOptionElement
                             index={index}
-                            onAlterOrderHandler={(elementReceived: EVALUATION.SelectOptions, action: "up" | "down") => {
+                            onAlterOrderHandler={(elementReceived: EVALUATION.MultipleOptions, action: "up" | "down") => {
                               let idx = element.options.indexOf(elementReceived);
 
                               if (idx > -1) {
@@ -201,25 +198,25 @@ const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlt
                                 }
                               }
                             }}
-                            onCopyHandler={(e: EVALUATION.SelectOptions) => {
-                              let idx = element.options.indexOf(e);
+                            onCopyHandler={(e: EVALUATION.MultipleOptions) => {
+                              let idx = element.options.indexOf(e);                              
                               if (idx > -1) {
                                 setElement(element => produce(element, draft => {
-                                  let { id } = element;
-                                  draft.options.splice(idx, 0, { ...e, id: generate(), name: id });
+                                  let id = generate();                                  
+                                  draft.options.splice(idx, 0, { ...e, id:id, name:id});
                                 }))
                               }
                             }}
-                            onRemoveHandler={(e: EVALUATION.SelectOptions) => { removeOption(e) }}
-                            onUpdateHandler={(e: EVALUATION.SelectOptions) => {
+                            onRemoveHandler={(e: EVALUATION.MultipleOptions) => { removeOption(e) }}
+                            onUpdateHandler={(e: EVALUATION.MultipleOptions) => {
                               setElement(element => produce(element, draft => {
                                 draft.options[index] = e;
                               }))
                             }}
                             optionElement={item}
-                            onSelectHandler={(e: EVALUATION.SelectOptions) => {
+                            onSelectHandler={(e: EVALUATION.MultipleOptions) => {                              
                               setElement(element => produce(element, draft => {
-                                draft.response = e;
+                                draft.response?.push(e);
                               }))
                             }}
                           />
@@ -268,4 +265,4 @@ const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlt
   );
 }
 
-export default SelectType;
+export default MultipleType;

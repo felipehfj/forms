@@ -18,39 +18,46 @@ interface IElement {
   subtitle?: string,
   imagePath?: string,
   required: boolean,
-  response?: string,
+  response?: string|number|SelectOptions|Array<MultipleOptions>,
   options?:Array<MultipleOptions|SelectOptions>
 }
 
 export declare namespace EVALUATION {
   interface TextElement extends IElement {
-    type: "text"
+    type: "text",
+    response?: string,
   }
 
   interface NumberElement extends IElement {
-    type: "number"
+    type: "number",
+    response?: string|number,
   }
 
   interface EmailElement extends IElement {
-    type: "email"
+    type: "email",
+    response?: string,
   }
 
   interface DateElement extends IElement {
-    type: "date"
+    type: "date",
+    response?: string,
   } 
 
   interface ParagraphElement extends IElement {
     type: "paragraph",
+    response?: string,
   }
 
   interface SelectElement extends IElement {
     type: "select",
     options: Array<SelectOptions>,
+    response?: SelectOptions,
   }
 
   interface MultipleElement extends IElement {
     type: "multiple",
     options: Array<MultipleOptions>,
+    response:Array<MultipleOptions>,
   }
   
   interface SelectOptions extends IOption {

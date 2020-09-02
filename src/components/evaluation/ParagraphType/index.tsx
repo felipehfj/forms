@@ -23,9 +23,9 @@ const TextType: FC<ParagraphTypeProps> = ({ paragraphElement, onRemoveHandler, o
     }
   }, [paragraphElement])
 
-  useEffect(() =>{
-    setElement({...element, order: index})
-  },[index])
+  useEffect(() => {
+    setElement({ ...element, order: index })
+  }, [index])
 
   useEffect(() => {
     onUpdateHandler(element);
@@ -43,8 +43,8 @@ const TextType: FC<ParagraphTypeProps> = ({ paragraphElement, onRemoveHandler, o
     }
   }
 
-  const remove = (element: EVALUATION.ParagraphElement) =>{
-    if(onRemoveHandler){
+  const remove = (element: EVALUATION.ParagraphElement) => {
+    if (onRemoveHandler) {
       onRemoveHandler(element);
     }
   }
@@ -132,7 +132,7 @@ const TextType: FC<ParagraphTypeProps> = ({ paragraphElement, onRemoveHandler, o
                 </div>
 
                 <div className="col-xs-12 col-sm-12 col-md-4 col-lg-4">
-                  <ImageElement imgSrc={element.imagePath} onChange={((e:string) => {setElement({...element, imagePath: e})})} />
+                  <ImageElement imgSrc={element.imagePath} onChange={((e: string) => { setElement({ ...element, imagePath: e }) })} />
                 </div>
               </div>
             </div>
@@ -142,14 +142,13 @@ const TextType: FC<ParagraphTypeProps> = ({ paragraphElement, onRemoveHandler, o
                 <div className="col-xs-12" >
                   <div className="form-group">
 
-                    <textarea                      
+                    <textarea
                       style={{ width: '100%', resize: 'none', padding: '2rem' }}
                       name="response"
                       value={element.response}
                       maxLength={4000}
                       className="form-control"
                       placeholder="Insira a sua resposta"
-                      readOnly
                       onChange={e => {
                         const { name, value } = e.target;
                         setElement({ ...element, [name]: value })
@@ -188,9 +187,6 @@ const TextType: FC<ParagraphTypeProps> = ({ paragraphElement, onRemoveHandler, o
               </div>
             </div>
           </div>
-
-          <div>{JSON.stringify(element, null, 2)}</div>
-
         </div>
       </div>
     </Fragment>

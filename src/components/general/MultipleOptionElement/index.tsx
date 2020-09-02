@@ -5,36 +5,42 @@ import produce from 'immer';
 
 import './styles.css';
 
-interface OptionElementProps {
-  optionElement: EVALUATION.SelectOptions,
+interface MultipleOptionElementProps {
+  optionElement: EVALUATION.MultipleOptions,
   onUpdateHandler: Function,
   onRemoveHandler: Function,
   onCopyHandler: Function,
   onAlterOrderHandler: Function,
+  onSelectHandler:Function,
   index: number
 }
 
-const OptionElement: FC<OptionElementProps> = ({ optionElement, onAlterOrderHandler, onCopyHandler, onRemoveHandler, onUpdateHandler, index }) => {
-  const [option, setOption] = useState<EVALUATION.SelectOptions>(optionElement);
+const MultipleOptionElement: FC<MultipleOptionElementProps> = ({ optionElement, onAlterOrderHandler, onCopyHandler, onRemoveHandler, onUpdateHandler,onSelectHandler, index }) => {
+  const [option, setOption] = useState<EVALUATION.MultipleOptions>(optionElement);
 
   useEffect(() => { setOption(optionElement => optionElement) }, [optionElement]);
 
-  useEffect(() => { update(option) }, [option]);
+  useEffect(() => {     
+    update(option) }, [option]);
 
-  const alterOrder = (optionElement: EVALUATION.SelectOptions, action: "up" | "down") => {
+  const alterOrder = (optionElement: EVALUATION.MultipleOptions, action: "up" | "down") => {
     onAlterOrderHandler(optionElement, action);
   }
 
-  const copy = (optionElement: EVALUATION.SelectOptions) => {
+  const copy = (optionElement: EVALUATION.MultipleOptions) => {
     onCopyHandler(optionElement)
   }
 
-  const remove = (optionElement: EVALUATION.SelectOptions) => {
+  const remove = (optionElement: EVALUATION.MultipleOptions) => {
     onRemoveHandler(optionElement)
   }
 
-  const update = (optionElement: EVALUATION.SelectOptions) => {
+  const update = (optionElement: EVALUATION.MultipleOptions) => {
     onUpdateHandler(optionElement);
+  }
+
+  const onSelect = (optionElement: EVALUATION.MultipleOptions) => {
+    onSelectHandler(optionElement);
   }
 
   return (
@@ -43,11 +49,12 @@ const OptionElement: FC<OptionElementProps> = ({ optionElement, onAlterOrderHand
         <div className="question-choice-label inline-display">
           <div className="question-choice-icon-group">
             <input
-              aria-label="Opção 1"
+              aria-label={option.name}
               className="design-question-choice-icon"
-              type="radio"
+              type="checkbox"
               name={option.name}            
-              value={option.value} />
+              value={option.value}
+              onChange={() => onSelect(option)} />
           </div>
         </div>
         <div className="question-choice-option-textbox inline-display">
@@ -105,4 +112,4 @@ const OptionElement: FC<OptionElementProps> = ({ optionElement, onAlterOrderHand
   );
 }
 
-export default OptionElement;
+export default MultipleOptionElement;

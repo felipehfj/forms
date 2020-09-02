@@ -37,6 +37,11 @@ const ElementButtonBar: FC<ElementButtonBarProps> = (props: ElementButtonBarProp
             >
                 select
             </button>
+            <button
+                onClick={() => props.addElement('multiple')}
+            >
+                multiple
+            </button>
         </Fragment>
     );
 }
