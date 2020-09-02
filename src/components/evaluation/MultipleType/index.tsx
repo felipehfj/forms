@@ -256,9 +256,7 @@ const MultipleType: FC<MultipleTypeProps> = ({ multipleElement, onRemoveHandler,
 
               </div>
             </div>
-          </div>
-
-          <div>{JSON.stringify(element, null, 2)}</div>
+          </div>          
         </div>
       </div>
     </Fragment>
