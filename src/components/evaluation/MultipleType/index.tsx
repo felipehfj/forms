@@ -5,7 +5,7 @@ import { FaArrowUp, FaArrowDown, FaTrash, FaCopy } from 'react-icons/fa';
 import './styles.css';
 import ImageElement from '../../general/ImageElement';
 import MultipleOptionElement from '../../general/MultipleOptionElement';
-
+import LoggedUser from '../../general/LoggedUser';
 import { EVALUATION } from '../../../interfaces/elements';
 import { generate } from 'shortid';
 
@@ -38,7 +38,7 @@ const MultipleType: FC<MultipleTypeProps> = ({ multipleElement, onRemoveHandler,
   const addOption = () => {
     setElement(element => produce(element, draft => {
       let id = generate();
-      draft.options.push({ id: id, name:id, value: "" });
+      draft.options.push({ id: id, name:id, value: "", ownerId: LoggedUser.userId, createdAt: new Date() });
     }))
   }
 

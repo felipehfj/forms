@@ -5,7 +5,7 @@ import { FaArrowUp, FaArrowDown, FaTrash, FaCopy } from 'react-icons/fa';
 import './styles.css';
 import ImageElement from '../../general/ImageElement';
 import SelectOptionElement from '../../general/SelectOptionElement';
-
+import LoggedUser from '../../general/LoggedUser';
 import { EVALUATION } from '../../../interfaces/elements';
 import { generate } from 'shortid';
 
@@ -37,7 +37,7 @@ const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlt
 
   const addOption = () => {
     setElement(element => produce(element, draft => {
-      draft.options.push({ id: generate(), name: element.id, value: "" });
+      draft.options.push({ id: generate(), name: element.id, value: "", ownerId: LoggedUser.userId, createdAt: new Date() });
     }))
   }
 
