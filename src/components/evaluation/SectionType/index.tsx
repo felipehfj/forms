@@ -38,7 +38,12 @@ const SectionType: FC<SectionTypeProps> = ({ children, sectionElement, onAlterOr
     setSection(section => produce(section, draft => {
       draft.formElements = elements;
     }))
-  }, []);
+    onUpdateHandler(section);
+  }, [elements]);
+
+  useEffect(() => {
+    onUpdateHandler(section)
+  }, [section])
 
   const addElement = (type: string) => {
     let orderCount = elements.length;
@@ -253,108 +258,143 @@ const SectionType: FC<SectionTypeProps> = ({ children, sectionElement, onAlterOr
     <Fragment>
       <div style={{ textAlign: "center" }}>
 
-        <ElementButtonBar addElement={addElement} />
+        <div className="portlet light">
+          <div className="portlet-title">
+            <div className="caption">
+              <input
+                name="title"
+                value={section.title}
+                onChange={(e) => {
+                  const { name, value } = e.target;
+                  setSection({ ...section, [name]: value })
+                }} />
+            </div>
+            <div className="actions">
+              <div className="button-group">
+              <ElementButtonBar addElement={addElement} />
+              </div>
+            </div>
+          </div>
+          <div className="portlet-body">
+            <div className="section-elements-container">
+              {section.formElements.map((p, index) => {
+                switch (p.type) {
+                  case 'text':
+                    return (
+                      <div key={p.id}>
+                        <TextType
+                          textElement={p}
+                          onRemoveHandler={handleRemove}
+                          onUpdateHandler={handleUpdate}
+                          onAlterOrderHandler={handleAlterOrder}
+                          onCopyHandler={handleCopy}
+                          index={index}
+                        />
 
-        <div>{JSON.stringify(elements, null, 2)}</div>
+                        <ElementButtonBar addElement={addElement} />
+                      </div>
+                    );
+                  case 'number':
+                    return (
+                      <div key={p.id}>
+                        <NumberType
+                          numberElement={p}
+                          onRemoveHandler={handleRemove}
+                          onUpdateHandler={handleUpdate}
+                          onAlterOrderHandler={handleAlterOrder}
+                          onCopyHandler={handleCopy}
+                          index={index}
+                        />
 
-        {elements.map((p, index) => {
-          switch (p.type) {
-            case 'text':
-              return (
-                <div key={p.id}>
-                  <TextType
-                    textElement={p}
-                    onRemoveHandler={handleRemove}
-                    onUpdateHandler={handleUpdate}
-                    onAlterOrderHandler={handleAlterOrder}
-                    onCopyHandler={handleCopy}
-                    index={index}
-                  />
-                </div>
-              );
-            case 'number':
-              return (
-                <div key={p.id}>
-                  <NumberType
-                    numberElement={p}
-                    onRemoveHandler={handleRemove}
-                    onUpdateHandler={handleUpdate}
-                    onAlterOrderHandler={handleAlterOrder}
-                    onCopyHandler={handleCopy}
-                    index={index}
-                  />
-                </div>
-              );
-            case 'email':
-              return (
-                <div key={p.id}>
-                  <EmailType
-                    emailElement={p}
-                    onRemoveHandler={handleRemove}
-                    onUpdateHandler={handleUpdate}
-                    onAlterOrderHandler={handleAlterOrder}
-                    onCopyHandler={handleCopy}
-                    index={index}
-                  />
-                </div>
-              );
-            case 'date':
-              return (
-                <div key={p.id}>
-                  <DateType
-                    dateElement={p}
-                    onRemoveHandler={handleRemove}
-                    onUpdateHandler={handleUpdate}
-                    onAlterOrderHandler={handleAlterOrder}
-                    onCopyHandler={handleCopy}
-                    index={index}
-                  />
-                </div>
-              );
-            case 'paragraph':
-              return (
-                <div key={p.id}>
-                  <ParagraphType
-                    paragraphElement={p}
-                    onRemoveHandler={handleRemove}
-                    onUpdateHandler={handleUpdate}
-                    onAlterOrderHandler={handleAlterOrder}
-                    onCopyHandler={handleCopy}
-                    index={index}
-                  />
-                </div>
-              );
-            case 'select':
-              return (
-                <div key={p.id}>
-                  <SelectType
-                    selectElement={p}
-                    onRemoveHandler={handleRemove}
-                    onUpdateHandler={handleUpdate}
-                    onAlterOrderHandler={handleAlterOrder}
-                    onCopyHandler={handleCopy}
-                    index={index}
-                  />
-                </div>
-              );
-            case 'multiple':
-              return (
-                <div key={p.id}>
-                  <MultipleType
-                    multipleElement={p}
-                    onRemoveHandler={handleRemove}
-                    onUpdateHandler={handleUpdate}
-                    onAlterOrderHandler={handleAlterOrder}
-                    onCopyHandler={handleCopy}
-                    index={index}
-                  />
-                </div>
-              );
-            default:
-              return null;
-          }
-        })}
+                        <ElementButtonBar addElement={addElement} />
+                      </div>
+                    );
+                  case 'email':
+                    return (
+                      <div key={p.id}>
+                        <EmailType
+                          emailElement={p}
+                          onRemoveHandler={handleRemove}
+                          onUpdateHandler={handleUpdate}
+                          onAlterOrderHandler={handleAlterOrder}
+                          onCopyHandler={handleCopy}
+                          index={index}
+                        />
+
+                        <ElementButtonBar addElement={addElement} />
+                      </div>
+                    );
+                  case 'date':
+                    return (
+                      <div key={p.id}>
+                        <DateType
+                          dateElement={p}
+                          onRemoveHandler={handleRemove}
+                          onUpdateHandler={handleUpdate}
+                          onAlterOrderHandler={handleAlterOrder}
+                          onCopyHandler={handleCopy}
+                          index={index}
+                        />
+
+                        <ElementButtonBar addElement={addElement} />
+                      </div>
+                    );
+                  case 'paragraph':
+                    return (
+                      <div key={p.id}>
+                        <ParagraphType
+                          paragraphElement={p}
+                          onRemoveHandler={handleRemove}
+                          onUpdateHandler={handleUpdate}
+                          onAlterOrderHandler={handleAlterOrder}
+                          onCopyHandler={handleCopy}
+                          index={index}
+                        />
+
+                        <ElementButtonBar addElement={addElement} />
+                      </div>
+                    );
+                  case 'select':
+                    return (
+                      <div key={p.id}>
+                        <SelectType
+                          selectElement={p}
+                          onRemoveHandler={handleRemove}
+                          onUpdateHandler={handleUpdate}
+                          onAlterOrderHandler={handleAlterOrder}
+                          onCopyHandler={handleCopy}
+                          index={index}
+                        />
+
+                        <ElementButtonBar addElement={addElement} />
+                      </div>
+                    );
+                  case 'multiple':
+                    return (
+                      <div key={p.id}>
+                        <MultipleType
+                          multipleElement={p}
+                          onRemoveHandler={handleRemove}
+                          onUpdateHandler={handleUpdate}
+                          onAlterOrderHandler={handleAlterOrder}
+                          onCopyHandler={handleCopy}
+                          index={index}
+                        />
+
+                        <ElementButtonBar addElement={addElement} />
+                      </div>
+                    );
+                  default:
+                    return null;
+                }
+              })}
+            </div>
+          </div>
+        </div>
+
       </div>
+
+      {JSON.stringify(children, null, 2)}
     </Fragment>
   );
 };

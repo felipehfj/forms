@@ -216,6 +216,7 @@ const MultipleType: FC<MultipleTypeProps> = ({ multipleElement, onRemoveHandler,
                             optionElement={item}
                             onSelectHandler={(e: EVALUATION.MultipleOptions) => {                              
                               setElement(element => produce(element, draft => {
+                                console.log(e);
                                 draft.response?.push(e);
                               }))
                             }}

@@ -124,8 +124,7 @@ const TextType: FC<DateTypeProps> = ({ dateElement, onRemoveHandler, onAlterOrde
                       placeholder="Pergunta"
                       className="form-control"
                       onChange={e => {
-                        const { name, value } = e.target;
-                        console.log(e.target.name);
+                        const { name, value } = e.target;                        
                         setElement({ ...element, [name]: value })
                       }}
                     />

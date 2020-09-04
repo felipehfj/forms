@@ -53,8 +53,8 @@ const MultipleOptionElement: FC<MultipleOptionElementProps> = ({ optionElement, 
               className="design-question-choice-icon"
               type="checkbox"
               name={option.name}            
-              value={option.value}
-              onChange={() => onSelect(option)} />
+              value={option.value}              
+              onChange={(e) => {onSelect(option); console.log(e.target)}} />
           </div>
         </div>
         <div className="question-choice-option-textbox inline-display">
