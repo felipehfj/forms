@@ -1,5 +1,5 @@
 
-import React, { FC, Fragment, useState, useEffect } from "react";
+import React, { FC, Fragment, useState, useEffect, useRef } from "react";
 import { generate } from "shortid";
 import { produce } from "immer";
 import { EVALUATION } from '../../../interfaces/elements';
@@ -12,6 +12,9 @@ import MultipleType from "../../../components/evaluation/MultipleType";
 import SelectType from "../../../components/evaluation/SelectType";
 import LoggedUser from '../../../components/general/LoggedUser';
 import ElementButtonBar from "../../../components/general/ElementButtonBar";
+import SectionButtonBar from "../../general/SectionButtonBar";
+
+import Editable from '../../general/Editable';
 
 import './styles.css';
 
@@ -24,9 +27,11 @@ interface SectionTypeProps {
   index: number,
 }
 
-const SectionType: FC<SectionTypeProps> = ({ children, sectionElement, onAlterOrderHandler, onCopyHandler, onRemoveHandler, onUpdateHandler, index }) => {
+const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler, onCopyHandler, onRemoveHandler, onUpdateHandler, index }) => {
   const [section, setSection] = useState<EVALUATION.SectionElement>(sectionElement);
   const [elements, setElements] = useState<Array<EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement>>(sectionElement.formElements);
+  const titleInputRef = useRef<HTMLTextAreaElement>(null);
+  const subtitleInputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     setSection(section => produce(section, draft => {
@@ -41,28 +46,45 @@ const SectionType: FC<SectionTypeProps> = ({ children, sectionElement, onAlterOr
     onUpdateHandler(section);
   }, [elements]);
 
+  useEffect(()=>{setSection({...section, order: index})},[index])
+
   useEffect(() => {
     onUpdateHandler(section)
   }, [section])
 
-  const addElement = (type: string) => {
+  const addElement = (type: string, index: number) => {
     let orderCount = elements.length;
     switch (type) {
       case "text":
         setElements(elements =>
           produce(elements, draft => {
-            draft.push({
-              id: generate(),
-              order: orderCount,
-              required: true,
-              title: "",
-              type: "text",
-              imagePath: "",
-              response: "",
-              subtitle: "",
-              createdAt: new Date(),
-              ownerId: LoggedUser.userId,
-            });
+            if (index >= 0) {
+              draft.splice(index + 1, 0, {
+                id: generate(),
+                order: orderCount,
+                required: true,
+                title: "",
+                type: "text",
+                imagePath: "",
+                response: "",
+                subtitle: "",
+                createdAt: new Date(),
+                ownerId: LoggedUser.userId,
+              });
+            } else {
+              draft.push({
+                id: generate(),
+                order: orderCount,
+                required: true,
+                title: "",
+                type: "text",
+                imagePath: "",
+                response: "",
+                subtitle: "",
+                createdAt: new Date(),
+                ownerId: LoggedUser.userId,
+              });
+            }
           }));
         break;
       case "number":
@@ -170,8 +192,8 @@ const SectionType: FC<SectionTypeProps> = ({ children, sectionElement, onAlterOr
               response: [],
               subtitle: "",
               options: [
-                { id: id1, name: id1, value: '', ownerId: LoggedUser.userId, createdAt: new Date() },
-                { id: id2, name: id2, value: "Outros", ownerId: LoggedUser.userId, createdAt: new Date() },
+                { id: id1, name: id1, value: '', ownerId: LoggedUser.userId, createdAt: new Date(), checked: false },
+                { id: id2, name: id2, value: "Outros", ownerId: LoggedUser.userId, createdAt: new Date(), checked: false },
               ],
               createdAt: new Date(),
               ownerId: LoggedUser.userId,
@@ -236,17 +258,18 @@ const SectionType: FC<SectionTypeProps> = ({ children, sectionElement, onAlterOr
       setElements(elements => produce(elements, draft => {
         let genId = generate();
         if (e.options) {
-          let opt: Array<EVALUATION.MultipleOptions | EVALUATION.SelectOptions> = [];
 
           if (e.type === 'select') {
-            e.options.forEach(item => opt.push({ ...item, name: genId, ownerId: LoggedUser.userId, createdAt: new Date() }));
+            let optSelect: Array<EVALUATION.SelectOptions> = [];
+            e.options.forEach(item => optSelect.push({ ...item, name: genId, ownerId: LoggedUser.userId, createdAt: new Date() }));
+            draft.splice(idx, 0, { ...e, id: genId, imagePath: '', options: optSelect, createdAt: new Date() });
           }
 
           if (e.type === 'multiple') {
-            e.options.forEach(item => opt.push({ ...item, ownerId: LoggedUser.userId, createdAt: new Date() }));
+            let optMultiple: Array<EVALUATION.MultipleOptions> = [];
+            e.options.forEach(item => optMultiple.push({ ...item, ownerId: LoggedUser.userId, createdAt: new Date(), checked: false }));
+            draft.splice(idx, 0, { ...e, id: genId, imagePath: '', options: optMultiple, createdAt: new Date() });
           }
-
-          draft.splice(idx, 0, { ...e, id: genId, imagePath: '', options: opt, createdAt: new Date() });
         } else {
           draft.splice(idx, 0, { ...e, id: genId, imagePath: '', createdAt: new Date() });
         }
@@ -254,147 +277,188 @@ const SectionType: FC<SectionTypeProps> = ({ children, sectionElement, onAlterOr
     }
   }
 
+  function selectElement(p: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement, index: number) {
+    switch (p.type) {
+      case 'text':
+        return (
+          <TextType
+            textElement={p}
+            onRemoveHandler={handleRemove}
+            onUpdateHandler={handleUpdate}
+            onAlterOrderHandler={handleAlterOrder}
+            onCopyHandler={handleCopy}
+            index={index}
+          />
+        );
+      case 'number':
+        return (
+          <NumberType
+            numberElement={p}
+            onRemoveHandler={handleRemove}
+            onUpdateHandler={handleUpdate}
+            onAlterOrderHandler={handleAlterOrder}
+            onCopyHandler={handleCopy}
+            index={index}
+          />
+        );
+      case 'email':
+        return (
+          <EmailType
+            emailElement={p}
+            onRemoveHandler={handleRemove}
+            onUpdateHandler={handleUpdate}
+            onAlterOrderHandler={handleAlterOrder}
+            onCopyHandler={handleCopy}
+            index={index}
+          />
+        );
+      case 'date':
+        return (
+          <DateType
+            dateElement={p}
+            onRemoveHandler={handleRemove}
+            onUpdateHandler={handleUpdate}
+            onAlterOrderHandler={handleAlterOrder}
+            onCopyHandler={handleCopy}
+            index={index}
+          />
+        );
+      case 'paragraph':
+        return (
+          <ParagraphType
+            paragraphElement={p}
+            onRemoveHandler={handleRemove}
+            onUpdateHandler={handleUpdate}
+            onAlterOrderHandler={handleAlterOrder}
+            onCopyHandler={handleCopy}
+            index={index}
+          />
+        );
+      case 'select':
+        return (
+          <SelectType
+            selectElement={p}
+            onRemoveHandler={handleRemove}
+            onUpdateHandler={handleUpdate}
+            onAlterOrderHandler={handleAlterOrder}
+            onCopyHandler={handleCopy}
+            index={index}
+          />
+        );
+      case 'multiple':
+        return (
+          <MultipleType
+            multipleElement={p}
+            onRemoveHandler={handleRemove}
+            onUpdateHandler={handleUpdate}
+            onAlterOrderHandler={handleAlterOrder}
+            onCopyHandler={handleCopy}
+            index={index}
+          />
+        );
+      default:
+        return null;
+    }
+  }
+
   return (
     <Fragment>
-      <div style={{ textAlign: "center" }}>
-
-        <div className="portlet light">
+      <div className="container">
+        <div className="portlet light grey">
           <div className="portlet-title">
             <div className="caption">
-              <input
-                name="title"
-                value={section.title}
-                onChange={(e) => {
-                  const { name, value } = e.target;
-                  setSection({ ...section, [name]: value })
-                }} />
+              Seção {index}
             </div>
             <div className="actions">
-              <div className="button-group">
-              <ElementButtonBar addElement={addElement} />
+              <div className="controller-container">
+                <div className="btn-container">
+                  <SectionButtonBar 
+                  element={section}
+                  onAlterOrder={(e,a)=>{onAlterOrderHandler(e,a)}}  
+                  onCopy={(e)=>{onCopyHandler(e, index)}}  
+                  onRemove={(e)=>{onRemoveHandler(e)}}  
+                  index={index}
+                  />
+                </div>
               </div>
+
             </div>
           </div>
           <div className="portlet-body">
+            <div className="">
+              <div className="">
+                <h2>
+                  <Editable
+                    text={section.title}
+                    placeholder="Título da seção"
+                    type="textarea"
+                    childRef={titleInputRef}
+                    title="Clique para editar"
+                  >
+                    <textarea
+                      className="form-control"
+                      ref={titleInputRef}
+                      name="title"
+                      value={section.title}
+                      placeholder="Título da seção"
+                      onChange={(e) => {
+                        const { name, value } = e.target;
+                        setSection({ ...section, [name]: value })
+                      }} />
+                  </Editable>
+                </h2>
+              </div>
+              <div className="">
+                <h4>
+                  <Editable
+                    text={section.subtitle ? section.subtitle : ''}
+                    placeholder="Descrição da seção"
+                    type="textarea"
+                    childRef={subtitleInputRef}
+                    title="Clique para editar"
+                  >
+                    <textarea
+                      className="form-control"
+                      placeholder="Descrição da seção"
+                      ref={subtitleInputRef}
+                      name="subtitle"
+                      value={section.subtitle}
+                      onChange={(e) => {
+                        const { name, value } = e.target;
+                        setSection({ ...section, [name]: value })
+                      }} />
+                  </Editable>
+                </h4>
+              </div>
+            </div>
+
             <div className="section-elements-container">
-              {section.formElements.map((p, index) => {
-                switch (p.type) {
-                  case 'text':
+              {
+                section.formElements.length > 0 ?
+                  section.formElements.map((p, index) => {
                     return (
                       <div key={p.id}>
-                        <TextType
-                          textElement={p}
-                          onRemoveHandler={handleRemove}
-                          onUpdateHandler={handleUpdate}
-                          onAlterOrderHandler={handleAlterOrder}
-                          onCopyHandler={handleCopy}
-                          index={index}
-                        />
-
-                        <ElementButtonBar addElement={addElement} />
+                        {selectElement(p, index)}
+                        <div className="controller-container">
+                          <div className="btn-container">
+                            <ElementButtonBar addElement={addElement} index={index} />
+                          </div>
+                        </div>
                       </div>
-                    );
-                  case 'number':
-                    return (
-                      <div key={p.id}>
-                        <NumberType
-                          numberElement={p}
-                          onRemoveHandler={handleRemove}
-                          onUpdateHandler={handleUpdate}
-                          onAlterOrderHandler={handleAlterOrder}
-                          onCopyHandler={handleCopy}
-                          index={index}
-                        />
-
-                        <ElementButtonBar addElement={addElement} />
-                      </div>
-                    );
-                  case 'email':
-                    return (
-                      <div key={p.id}>
-                        <EmailType
-                          emailElement={p}
-                          onRemoveHandler={handleRemove}
-                          onUpdateHandler={handleUpdate}
-                          onAlterOrderHandler={handleAlterOrder}
-                          onCopyHandler={handleCopy}
-                          index={index}
-                        />
-
-                        <ElementButtonBar addElement={addElement} />
-                      </div>
-                    );
-                  case 'date':
-                    return (
-                      <div key={p.id}>
-                        <DateType
-                          dateElement={p}
-                          onRemoveHandler={handleRemove}
-                          onUpdateHandler={handleUpdate}
-                          onAlterOrderHandler={handleAlterOrder}
-                          onCopyHandler={handleCopy}
-                          index={index}
-                        />
-
-                        <ElementButtonBar addElement={addElement} />
-                      </div>
-                    );
-                  case 'paragraph':
-                    return (
-                      <div key={p.id}>
-                        <ParagraphType
-                          paragraphElement={p}
-                          onRemoveHandler={handleRemove}
-                          onUpdateHandler={handleUpdate}
-                          onAlterOrderHandler={handleAlterOrder}
-                          onCopyHandler={handleCopy}
-                          index={index}
-                        />
-
-                        <ElementButtonBar addElement={addElement} />
-                      </div>
-                    );
-                  case 'select':
-                    return (
-                      <div key={p.id}>
-                        <SelectType
-                          selectElement={p}
-                          onRemoveHandler={handleRemove}
-                          onUpdateHandler={handleUpdate}
-                          onAlterOrderHandler={handleAlterOrder}
-                          onCopyHandler={handleCopy}
-                          index={index}
-                        />
-
-                        <ElementButtonBar addElement={addElement} />
-                      </div>
-                    );
-                  case 'multiple':
-                    return (
-                      <div key={p.id}>
-                        <MultipleType
-                          multipleElement={p}
-                          onRemoveHandler={handleRemove}
-                          onUpdateHandler={handleUpdate}
-                          onAlterOrderHandler={handleAlterOrder}
-                          onCopyHandler={handleCopy}
-                          index={index}
-                        />
-
-                        <ElementButtonBar addElement={addElement} />
-                      </div>
-                    );
-                  default:
-                    return null;
-                }
-              })}
+                    )
+                  })
+                  :
+                  <div className="controller-container">
+                    <div className="btn-container">
+                      <ElementButtonBar addElement={addElement} index={index} />
+                    </div>
+                  </div>
+              }
             </div>
           </div>
         </div>
 
       </div>
-
-      {JSON.stringify(children, null, 2)}
     </Fragment>
   );
 };

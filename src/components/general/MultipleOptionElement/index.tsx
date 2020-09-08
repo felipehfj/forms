@@ -11,14 +11,16 @@ interface MultipleOptionElementProps {
   onRemoveHandler: Function,
   onCopyHandler: Function,
   onAlterOrderHandler: Function,
-  onSelectHandler:Function,
+  //onSelectHandler:Function,
   index: number
 }
 
-const MultipleOptionElement: FC<MultipleOptionElementProps> = ({ optionElement, onAlterOrderHandler, onCopyHandler, onRemoveHandler, onUpdateHandler,onSelectHandler, index }) => {
+const MultipleOptionElement: FC<MultipleOptionElementProps> = ({ optionElement, onAlterOrderHandler, onCopyHandler, onRemoveHandler, onUpdateHandler, index }) => {
   const [option, setOption] = useState<EVALUATION.MultipleOptions>(optionElement);
 
-  useEffect(() => { setOption(optionElement => optionElement) }, [optionElement]);
+  useEffect(() => { 
+    setOption(optionElement => optionElement);    
+   }, [optionElement]);
 
   useEffect(() => {     
     update(option) }, [option]);
@@ -39,10 +41,6 @@ const MultipleOptionElement: FC<MultipleOptionElementProps> = ({ optionElement, 
     onUpdateHandler(optionElement);
   }
 
-  const onSelect = (optionElement: EVALUATION.MultipleOptions) => {
-    onSelectHandler(optionElement);
-  }
-
   return (
     <Fragment>
       <div className="question-choice-container">
@@ -54,7 +52,12 @@ const MultipleOptionElement: FC<MultipleOptionElementProps> = ({ optionElement, 
               type="checkbox"
               name={option.name}            
               value={option.value}              
-              onChange={(e) => {onSelect(option); console.log(e.target)}} />
+              onChange={(e) => {                
+                setOption({...option, checked: !option.checked });                 
+                }
+              } 
+              defaultChecked={option.checked}                      
+              />
           </div>
         </div>
         <div className="question-choice-option-textbox inline-display">

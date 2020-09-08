@@ -1,15 +1,16 @@
 interface IOption{
   id: string,
   name: string,
-  value: string,
+  value: string,  
   ownerId: string,
   createdAt: Date, 
 }
 
-interface SelectOptions extends IOption {
+interface SelectOptions extends IOption {  
 }
 
 interface MultipleOptions extends IOption {
+  checked: boolean,
 }
 
 interface IBaseElement {
@@ -77,11 +78,11 @@ export declare namespace EVALUATION {
     formElements: Array<EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement>
   }
   
-  interface SelectOptions extends IOption {
+  interface SelectOptions extends IOption {    
   }
   
   interface MultipleOptions extends IOption {
-  }
-  
+    checked: boolean,
+  }  
 }
 

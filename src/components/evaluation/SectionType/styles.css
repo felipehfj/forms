@@ -1,0 +1,17 @@
+.controller-container{
+    position: relative;
+    display: block;        
+    width: 100%;
+    height: 5rem;
+}
+.controller-container .btn-container{
+    display: none;    
+}
+
+.portlet-title:hover .btn-container{
+    display: inline-block;
+}
+
+.controller-container:hover .btn-container{
+    display: inline-block;  
+}

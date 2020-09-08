@@ -1,6 +1,7 @@
 /* Container needed to position the button. Adjust the width as needed */
 .image-container {
-    position: relative;    
+    position: relative;
+    text-align: center;    
   }
   
   .image-container .btn-container{
