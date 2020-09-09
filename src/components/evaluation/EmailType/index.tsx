@@ -106,8 +106,7 @@ const EmailType: FC<EmailTypeProps> = ({ emailElement, onRemoveHandler, onAlterO
                     placeholder="Pergunta"
                     className="form-control"
                     onChange={e => {
-                      const { name, value } = e.target;
-                      console.log(e.target.name);
+                      const { name, value } = e.target;                      
                       setElement({ ...element, [name]: value })
                     }}
                   />

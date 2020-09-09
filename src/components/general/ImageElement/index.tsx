@@ -101,8 +101,7 @@ const ImageElement: FC<ImageElement> = (props: ImageElement) => {
                     label="Tamanho máximo permitido: 5MB."
                     fileContainerStyle={{ maxWidth: '300px', maxHeight: '300px' }}
                 />
-                <button type="button" onClick={closeModal}>ok</button>
-                {JSON.stringify(pictureUrl, null, 2)}
+                <button type="button" className="btn btn-secondary" style={{width:"100%"}} onClick={closeModal}>ok</button>                
             </Modal>
         </Fragment>
     );

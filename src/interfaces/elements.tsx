@@ -1,12 +1,12 @@
-interface IOption{
+interface IOption {
   id: string,
   name: string,
-  value: string,  
+  value: string,
   ownerId: string,
-  createdAt: Date, 
+  createdAt: Date,
 }
 
-interface SelectOptions extends IOption {  
+interface SelectOptions extends IOption {
 }
 
 interface MultipleOptions extends IOption {
@@ -15,25 +15,25 @@ interface MultipleOptions extends IOption {
 
 interface IBaseElement {
   id: string,
-  type: "text" | "paragraph" | "date" | "email" | "number" | "select" | "multiple"| "section",
+  type: "text" | "paragraph" | "date" | "email" | "number" | "select" | "multiple" | "section",
   order: number,
   title: string,
   subtitle?: string,
-  imagePath?:string,
+  imagePath?: string,
   ownerId: string,
-  createdAt: Date,    
+  createdAt: Date,
 }
 
-interface IElement extends IBaseElement{
+interface IElement extends IBaseElement {
   id: string,
   order: number,
-  type: "text" | "paragraph" | "date" | "email" | "number" | "select" | "multiple" ,
+  type: "text" | "paragraph" | "date" | "email" | "number" | "select" | "multiple",
   title: string,
   subtitle?: string,
   imagePath?: string,
   required: boolean,
-  response?: string|number|SelectOptions|Array<MultipleOptions>,
-  options?:Array<MultipleOptions|SelectOptions>, 
+  response?: string | number | SelectOptions | Array<MultipleOptions>,
+  options?: Array<MultipleOptions | SelectOptions>,
 }
 
 export declare namespace EVALUATION {
@@ -44,7 +44,7 @@ export declare namespace EVALUATION {
 
   interface NumberElement extends IElement {
     type: "number",
-    response?: string|number,
+    response?: string | number,
   }
 
   interface EmailElement extends IElement {
@@ -55,7 +55,7 @@ export declare namespace EVALUATION {
   interface DateElement extends IElement {
     type: "date",
     response?: string,
-  } 
+  }
 
   interface ParagraphElement extends IElement {
     type: "paragraph",
@@ -71,18 +71,32 @@ export declare namespace EVALUATION {
   interface MultipleElement extends IElement {
     type: "multiple",
     options: Array<MultipleOptions>,
-    response:Array<MultipleOptions>,
+    response: Array<MultipleOptions>,
   }
 
-  interface SectionElement extends IBaseElement{
+  interface SectionElement extends IBaseElement {
     formElements: Array<EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement>
   }
-  
-  interface SelectOptions extends IOption {    
+
+  interface SelectOptions extends IOption {
   }
-  
+
   interface MultipleOptions extends IOption {
     checked: boolean,
-  }  
+  }
+
+  interface Form {
+    id: string,
+    ownerId: string,
+    tipo: "survey" | "evaluation",
+    theme: string,
+    status: 'elaboration' | 'active' | 'inactive',
+    startAt?: Date,
+    endAt?: Date,
+    sections: Array<SectionElement>,
+    thanksMessage?: string,
+    createdAt: Date,
+    isPublic: boolean,
+  }
 }
 

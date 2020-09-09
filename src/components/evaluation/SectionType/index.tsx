@@ -13,9 +13,9 @@ import SelectType from "../../../components/evaluation/SelectType";
 import LoggedUser from '../../../components/general/LoggedUser';
 import ElementButtonBar from "../../../components/general/ElementButtonBar";
 import SectionButtonBar from "../../general/SectionButtonBar";
-
+import {Collapse} from 'react-collapse';
 import Editable from '../../general/Editable';
-
+import StringUtils from '../../../utils/StringUtils';
 import './styles.css';
 
 interface SectionTypeProps {
@@ -24,15 +24,16 @@ interface SectionTypeProps {
   onUpdateHandler: Function,
   onCopyHandler: Function,
   onAlterOrderHandler: Function,
+  onAddSection:Function,
   index: number,
 }
 
-const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler, onCopyHandler, onRemoveHandler, onUpdateHandler, index }) => {
+const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler, onCopyHandler, onRemoveHandler, onUpdateHandler,onAddSection, index }) => {
   const [section, setSection] = useState<EVALUATION.SectionElement>(sectionElement);
   const [elements, setElements] = useState<Array<EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement>>(sectionElement.formElements);
   const titleInputRef = useRef<HTMLTextAreaElement>(null);
   const subtitleInputRef = useRef<HTMLTextAreaElement>(null);
-
+  const [isOpened, setIsOpened] = useState(true);
   useEffect(() => {
     setSection(section => produce(section, draft => {
       draft = sectionElement;
@@ -367,16 +368,21 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
         <div className="portlet light grey">
           <div className="portlet-title">
             <div className="caption">
-              Seção {index}
+              Seção {index+1} {section.title ? StringUtils.truncate(` | ${section.title}`, 50 ) : '' }
+            </div>
+            <div className="tools">
+            
             </div>
             <div className="actions">
               <div className="controller-container">
-                <div className="btn-container">
+                <div className="btn-container">                  
                   <SectionButtonBar 
                   element={section}
                   onAlterOrder={(e,a)=>{onAlterOrderHandler(e,a)}}  
-                  onCopy={(e)=>{onCopyHandler(e, index)}}  
-                  onRemove={(e)=>{onRemoveHandler(e)}}  
+                  onCopy={(e:any, i:number)=>{onCopyHandler(e, index)}}  
+                  onRemove={(e:any,i:number)=>{onRemoveHandler(e,i)}}  
+                  onAdd={()=>onAddSection()}
+                  onCollapse={() => setIsOpened(isOpened => !isOpened)}
                   index={index}
                   />
                 </div>
@@ -384,6 +390,7 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
 
             </div>
           </div>
+          <Collapse isOpened={isOpened}>
           <div className="portlet-body">
             <div className="">
               <div className="">
@@ -456,8 +463,8 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
               }
             </div>
           </div>
-        </div>
-
+          </Collapse>
+        </div>        
       </div>
     </Fragment>
   );
