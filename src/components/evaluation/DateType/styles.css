@@ -1,33 +1,22 @@
-.action-button-group{
-    display: none;
-}
-.portlet .portlet-title{
-    height: 1rem;
-}
-/* .portlet-title:hover .action-button-group{
-    display: inline-block;
-} */
-
-
-.mb-10{
-    margin-bottom: 10px;
+.design-date-action-button-group{
+  display: none;
 }
 
-.title-area{
-    max-height: 300px;
+.design-date-title-area{
+  max-height: 300px;
 }
 
-.response-area{
-    margin-bottom: 1rem;
+.design-date-response-area{
+  margin-bottom: 1rem;
 }
 
-.config-area{
-    margin-bottom: 1rem;
+.design-date-config-area{
+  margin-bottom: 1rem;
 }
 
-.area-separator{
-    margin-bottom: 1rem;
-    border-top: 1px solid lightgray;    
+.design-date-area-separator{
+  margin-bottom: 1rem;
+  border-top: 1px solid lightgray;    
 }
 
 .react-datepicker {

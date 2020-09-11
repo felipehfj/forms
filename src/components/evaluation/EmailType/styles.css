@@ -1,31 +1,20 @@
-.action-button-group{
+.design-email-action-button-group{
     display: none;
 }
-.portlet .portlet-title{
-    height: 1rem;
-}
-/* .portlet-title:hover .action-button-group{
-    display: inline-block;
-} */
 
-
-.mb-10{
-    margin-bottom: 10px;
-}
-
-.title-area{
+.design-email-title-area{
     max-height: 300px;
 }
 
-.response-area{
+.design-email-response-area{
     margin-bottom: 1rem;
 }
 
-.config-area{
+.design-email-config-area{
     margin-bottom: 1rem;
 }
 
-.area-separator{
+.design-email-area-separator{
     margin-bottom: 1rem;
     border-top: 1px solid lightgray;    
 }

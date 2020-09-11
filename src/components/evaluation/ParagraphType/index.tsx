@@ -11,7 +11,7 @@ interface ParagraphTypeProps {
   onUpdateHandler: Function,
   onCopyHandler: Function,
   onAlterOrderHandler: Function,
-  buttonBar?:any,
+  buttonBar?: any,
   index: number
 }
 
@@ -29,26 +29,20 @@ const TextType: FC<ParagraphTypeProps> = ({ paragraphElement, onRemoveHandler, o
   }, [paragraphElement])
 
   useEffect(() => {
-    setElement({ ...element, order: index })
+    setElement({ ...element, order: index });
   }, [index])
 
 
   const alterOrder = (element: EVALUATION.ParagraphElement, action: "up" | "down") => {
-    if (onAlterOrderHandler) {
-      onAlterOrderHandler(element, action);
-    }
+    onAlterOrderHandler(element, action);
   }
 
   const copy = (element: EVALUATION.ParagraphElement) => {
-    if (onCopyHandler) {
-      onCopyHandler(element);
-    }
+    onCopyHandler(element);
   }
 
   const remove = (element: EVALUATION.ParagraphElement) => {
-    if (onRemoveHandler) {
-      onRemoveHandler(element);
-    }
+    onRemoveHandler(element);
   }
 
   const handleFocusClick = (e: any) => {
@@ -58,7 +52,7 @@ const TextType: FC<ParagraphTypeProps> = ({ paragraphElement, onRemoveHandler, o
     }
     if (isUpdated) {
       onUpdateHandler(element);
-      setIsUpdated(false);      
+      setIsUpdated(false);
     }
     setSelected(false);
   }
@@ -78,11 +72,11 @@ const TextType: FC<ParagraphTypeProps> = ({ paragraphElement, onRemoveHandler, o
 
   return (
     <Fragment>
-      <div className="portlet light" ref={node} style={isSelected ? { boxShadow: 'inset 0 0 1rem rgba(0,0,0,0.7)' } : {} }>
-        <div className="portlet-title">          
+      <div className="portlet light" ref={node} style={isSelected ? { boxShadow: 'inset 0 0 1rem rgba(0,0,0,0.7)' } : {}}>
+        <div className="portlet-title">
           <div className="actions">
-            <div className='design-paragraph-action-button-group' style={isSelected?{display:'inline-block'} : {}}>
-            <ControlElementButtonBar
+            <div className='design-paragraph-action-button-group' style={isSelected ? { display: 'inline-block' } : {}}>
+              <ControlElementButtonBar
                 onAlterOrderUp={() => alterOrder(element, "up")}
                 onAlterOrderDown={() => alterOrder(element, "down")}
                 onCopy={() => copy(element)}
@@ -107,8 +101,8 @@ const TextType: FC<ParagraphTypeProps> = ({ paragraphElement, onRemoveHandler, o
                     placeholder="Pergunta"
                     className="form-control"
                     onChange={e => {
-                      const { name, value } = e.target;                      
-                      setElement({ ...element, [name]: value })
+                      const { name, value } = e.target;
+                      handleElementChange(name, value);
                     }}
                   />
 
@@ -131,10 +125,10 @@ const TextType: FC<ParagraphTypeProps> = ({ paragraphElement, onRemoveHandler, o
               </div>
 
               <div className="col-xs-12 col-sm-12 col-md-4 col-lg-4">
-              <ImageElement
+                <ImageElement
                   imgSrc={element.imagePath}
                   onChange={(e: string) => {
-                    handleElementChange('imagePath', e);                    
+                    handleElementChange('imagePath', e);
                   }}
                 />
               </div>
@@ -169,7 +163,7 @@ const TextType: FC<ParagraphTypeProps> = ({ paragraphElement, onRemoveHandler, o
 
           <div className="design-paragraph-config-area">
             <div className="row">
-            <div className="col-md-8" style={{ marginTop: '2rem', marginBottom: '2rem', paddingBottom: 10 }}>
+              <div className="col-md-8" style={{ marginTop: '2rem', marginBottom: '2rem', paddingBottom: 10 }}>
                 {isSelected ? buttonBar : ''}
               </div>
               <div className="col-md-4">
@@ -190,7 +184,6 @@ const TextType: FC<ParagraphTypeProps> = ({ paragraphElement, onRemoveHandler, o
                   />
                 </div>
               </div>
-
             </div>
           </div>
         </div>

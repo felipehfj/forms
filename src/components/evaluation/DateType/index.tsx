@@ -1,6 +1,6 @@
-import React, { Fragment, FC, useState, useEffect } from 'react';
+import React, { Fragment, FC, useState, useEffect, useRef } from 'react';
 import SliderSwitch from '../../general/SliderSwitch';
-import { FaArrowUp, FaArrowDown, FaTrash, FaCopy } from 'react-icons/fa';
+import ControlElementButtonBar from '../../general/ControlElementButtonBar';
 import './styles.css';
 import ImageElement from '../../general/ImageElement';
 import { EVALUATION } from '../../../interfaces/elements';
@@ -17,13 +17,18 @@ interface DateTypeProps {
   onUpdateHandler: Function,
   onCopyHandler: Function,
   onAlterOrderHandler: Function,
+  buttonBar?:any,
   index: number
 }
 
 
 registerLocale('br', br);
 
-const TextType: FC<DateTypeProps> = ({ dateElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler, index }: DateTypeProps) => {
+const TextType: FC<DateTypeProps> = ({ dateElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler,buttonBar, index }: DateTypeProps) => {
+  const [isUpdated, setIsUpdated] = useState<boolean>(false);
+  const [isSelected, setSelected] = useState<boolean>(false);
+  const node = useRef<HTMLDivElement>(null);
+
   const [element, setElement] = useState<EVALUATION.DateElement>(dateElement)
 
   useEffect(() => {
@@ -31,10 +36,6 @@ const TextType: FC<DateTypeProps> = ({ dateElement, onRemoveHandler, onAlterOrde
       setElement(dateElement => dateElement);
     }
   }, [dateElement])
-
-  useEffect(() => {
-    onUpdateHandler(element);
-  }, [element])
 
   useEffect(() => {
     setElement({ ...element, order: index })
@@ -66,50 +67,51 @@ const TextType: FC<DateTypeProps> = ({ dateElement, onRemoveHandler, onAlterOrde
     }
   }
 
+
+  const handleFocusClick = (e: any) => {
+    if (node && node.current && node.current.contains(e.target)) {
+      setSelected(true);
+      return;
+    }
+    if (isUpdated) {
+      onUpdateHandler(element);
+      setIsUpdated(false);
+    }
+    setSelected(false);
+  }
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleFocusClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleFocusClick)
+    }
+  })
+
+  const handleElementChange = (name: any, value: any) => {
+    setElement({ ...element, [name]: value });
+    setIsUpdated(true);
+  }
+
+
   return (
     <Fragment>
-      <div className="portlet light">
+      <div className="portlet light" ref={node} style={isSelected ? { boxShadow: 'inset 0 0 1rem rgba(0,0,0,0.7)' } : {}}>
         <div className="portlet-title">
-          <div className="caption">{element.order}</div>
           <div className="actions">
-            <div className='action-button-group'>
-              <button
-                type="button"
-                className="btn btn-link"
-                title="Mover elemento para uma posição anterior"
-                onClick={() => { alterOrder(element, "up"); }}
-              >
-                <FaArrowUp />
-              </button>
-              <button
-                type="button"
-                className="btn btn-link"
-                title="Mover elemento para uma posição posterior"
-                onClick={() => { alterOrder(element, "down"); }}
-              >
-                <FaArrowDown />
-              </button>
-              <button
-                type="button"
-                className="btn btn-link"
-                title="Copiar elemento"
-                onClick={() => { copy(element); }}
-              >
-                <FaCopy />
-              </button>
-              <button
-                type="button"
-                className="btn btn-link"
-                title="Remover elemento"
-                onClick={() => { remove(element); }}
-              ><FaTrash />
-              </button>
+            <div className='design-date-action-button-group' style={isSelected ? { display: 'inline-block' } : {}}>
+              <ControlElementButtonBar
+                onAlterOrderUp={() => alterOrder(element, "up")}
+                onAlterOrderDown={() => alterOrder(element, "down")}
+                onCopy={() => copy(element)}
+                onRemove={() => remove(element)}
+              />
             </div>
           </div>
         </div>
         <div className="portlet-body">
 
-          <div className="title-area">
+          <div className="design-date-title-area">
             <div className="row">
               <div className="col-xs-12 col-sm-12 col-md-8 col-lg-8">
                 <div className="form-group">
@@ -124,7 +126,7 @@ const TextType: FC<DateTypeProps> = ({ dateElement, onRemoveHandler, onAlterOrde
                     className="form-control"
                     onChange={e => {
                       const { name, value } = e.target;
-                      setElement({ ...element, [name]: value })
+                      handleElementChange(name, value);
                     }}
                   />
 
@@ -140,19 +142,24 @@ const TextType: FC<DateTypeProps> = ({ dateElement, onRemoveHandler, onAlterOrde
                     placeholder="Descrição da pergunta"
                     onChange={e => {
                       const { name, value } = e.target;
-                      setElement({ ...element, [name]: value })
+                      handleElementChange(name, value);
                     }}
                   />
                 </div>
               </div>
 
               <div className="col-xs-12 col-sm-12 col-md-4 col-lg-4">
-                <ImageElement imgSrc={element.imagePath} onChange={((e: string) => { setElement({ ...element, imagePath: e }) })} />
+                <ImageElement
+                  imgSrc={element.imagePath}
+                  onChange={(e: string) => {
+                    handleElementChange('imagePath', e);
+                  }}
+                />
               </div>
             </div>
           </div>
 
-          <div className="response-area">
+          <div className="design-date-response-area">
             <div className="row">
               <div className="col-xs-12" >
                 <div className="form-group">
@@ -163,16 +170,15 @@ const TextType: FC<DateTypeProps> = ({ dateElement, onRemoveHandler, onAlterOrde
                     dateFormat="dd/MM/yyyy"
                     name="response"
                     selected={element.response ? formatDate(element.response) : null}
+                    customInput={<InputMask mask="99/99/9999" />}
                     onChange={e => {
                       let val = e ? e : '';
-
-                      if (val instanceof Date) {
-                        setElement({ ...element, response: format(val, 'dd/MM/yyyy', { locale: br }) })
+                      if (val instanceof Date) {                        
+                        handleElementChange('response', format(val, 'dd/MM/yyyy', { locale: br }));
                       } else {
-                        setElement({ ...element, response: '' })
+                        handleElementChange('response', '');
                       }
                     }}
-                    customInput={<InputMask mask="99/99/9999" />}
                   />
                 </div>
               </div>
@@ -180,11 +186,14 @@ const TextType: FC<DateTypeProps> = ({ dateElement, onRemoveHandler, onAlterOrde
 
           </div>
 
-          <div className='area-separator' />
+          <div className='design-date-area-separator' />
 
-          <div className="config-area">
+          <div className="design-date-config-area">
             <div className="row">
-              <div className="col-md-offset-8 col-md-4">
+            <div className="col-md-8" style={{ marginTop: '2rem', marginBottom: '2rem', paddingBottom: 10 }}>
+                {isSelected ? buttonBar : ''}
+              </div>
+              <div className="col-md-4">
                 <div className="form-group" style={{ marginTop: '2rem', marginBottom: '2rem', paddingBottom: 10 }}>
                   <label
                     className="mt-checkbox"
@@ -197,7 +206,7 @@ const TextType: FC<DateTypeProps> = ({ dateElement, onRemoveHandler, onAlterOrde
                     name="required"
                     checked={element.required}
                     onChange={(e: boolean) => {
-                      setElement({ ...element, required: e })
+                      handleElementChange('required', e);
                     }}
                   />
                 </div>
@@ -205,7 +214,7 @@ const TextType: FC<DateTypeProps> = ({ dateElement, onRemoveHandler, onAlterOrde
 
             </div>
           </div>
-        </div>        
+        </div>
       </div>
     </Fragment>
   );

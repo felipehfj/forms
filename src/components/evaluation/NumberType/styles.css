@@ -1,31 +1,20 @@
-.action-button-group{
+.design-number-action-button-group{
     display: none;
 }
-.portlet .portlet-title{
-    height: 1rem;
-}
-/* .portlet-title:hover .action-button-group{
-    display: inline-block;
-} */
 
-
-.mb-10{
-    margin-bottom: 10px;
-}
-
-.title-area{
+.design-number-title-area{
     max-height: 300px;
 }
 
-.response-area{
+.design-number-response-area{
     margin-bottom: 1rem;
 }
 
-.config-area{
+.design-number-config-area{
     margin-bottom: 1rem;
 }
 
-.area-separator{
+.design-number-area-separator{
     margin-bottom: 1rem;
     border-top: 1px solid lightgray;    
 }

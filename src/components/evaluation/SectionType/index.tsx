@@ -91,114 +91,215 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
       case "number":
         setElements(elements =>
           produce(elements, draft => {
-            draft.push({
-              id: generate(),
-              order: orderCount,
-              required: true,
-              title: "",
-              type: "number",
-              imagePath: "",
-              response: "",
-              subtitle: "",
-              createdAt: new Date(),
-              ownerId: LoggedUser.userId
-            });
+            if (index >= 0) {
+              draft.splice(index + 1, 0, {
+                id: generate(),
+                order: orderCount,
+                required: true,
+                title: "",
+                type: "number",
+                imagePath: "",
+                response: "",
+                subtitle: "",
+                createdAt: new Date(),
+                ownerId: LoggedUser.userId
+              });
+            } else {
+              draft.push({
+                id: generate(),
+                order: orderCount,
+                required: true,
+                title: "",
+                type: "number",
+                imagePath: "",
+                response: "",
+                subtitle: "",
+                createdAt: new Date(),
+                ownerId: LoggedUser.userId
+              });
+            }
           }));
         break;
       case "email":
         setElements(elements =>
           produce(elements, draft => {
-            draft.push({
-              id: generate(),
-              order: orderCount,
-              required: true,
-              title: "",
-              type: "email",
-              imagePath: "",
-              response: "",
-              subtitle: "",
-              createdAt: new Date(),
-              ownerId: LoggedUser.userId,
-            });
+            if (index >= 0) {
+              draft.splice(index + 1, 0, {
+                id: generate(),
+                order: orderCount,
+                required: true,
+                title: "",
+                type: "email",
+                imagePath: "",
+                response: "",
+                subtitle: "",
+                createdAt: new Date(),
+                ownerId: LoggedUser.userId,
+              });
+            } else {
+              draft.push({
+                id: generate(),
+                order: orderCount,
+                required: true,
+                title: "",
+                type: "email",
+                imagePath: "",
+                response: "",
+                subtitle: "",
+                createdAt: new Date(),
+                ownerId: LoggedUser.userId,
+              });
+            }
           }));
         break;
       case "paragraph":
         setElements(elements =>
           produce(elements, draft => {
-            draft.push({
-              id: generate(),
-              order: orderCount,
-              required: true,
-              title: "",
-              type: "paragraph",
-              imagePath: "",
-              response: "",
-              subtitle: "",
-              createdAt: new Date(),
-              ownerId: LoggedUser.userId,
-            });
+            if (index >= 0) {
+              draft.splice(index + 1, 0, {
+                id: generate(),
+                order: orderCount,
+                required: true,
+                title: "",
+                type: "paragraph",
+                imagePath: "",
+                response: "",
+                subtitle: "",
+                createdAt: new Date(),
+                ownerId: LoggedUser.userId,
+              });
+            } else {
+              draft.push({
+                id: generate(),
+                order: orderCount,
+                required: true,
+                title: "",
+                type: "paragraph",
+                imagePath: "",
+                response: "",
+                subtitle: "",
+                createdAt: new Date(),
+                ownerId: LoggedUser.userId,
+              });
+            }
           }));
         break;
       case "date":
         setElements(elements =>
           produce(elements, draft => {
-            draft.push({
-              id: generate(),
-              order: orderCount,
-              required: true,
-              title: "",
-              type: "date",
-              imagePath: "",
-              response: "",
-              subtitle: "",
-              createdAt: new Date(),
-              ownerId: LoggedUser.userId,
-            });
+            if (index >= 0) {
+              draft.splice(index + 1, 0, {
+                id: generate(),
+                order: orderCount,
+                required: true,
+                title: "",
+                type: "date",
+                imagePath: "",
+                response: "",
+                subtitle: "",
+                createdAt: new Date(),
+                ownerId: LoggedUser.userId,
+              });
+            } else {
+              draft.push({
+                id: generate(),
+                order: orderCount,
+                required: true,
+                title: "",
+                type: "date",
+                imagePath: "",
+                response: "",
+                subtitle: "",
+                createdAt: new Date(),
+                ownerId: LoggedUser.userId,
+              });
+            }
           }));
         break;
       case "select":
         setElements(elements =>
           produce(elements, draft => {
-            let id = generate()
-            draft.push({
-              id: id,
-              order: orderCount,
-              required: true,
-              title: "",
-              type: "select",
-              imagePath: "",
-              response: undefined,
-              subtitle: "",
-              options: [
-                { id: generate(), name: id, value: '', ownerId: LoggedUser.userId, createdAt: new Date() },
-                { id: generate(), name: id, value: "Outros", ownerId: LoggedUser.userId, createdAt: new Date() },
-              ],
-              createdAt: new Date(),
-              ownerId: LoggedUser.userId,
-            });
+            if (index >= 0) {
+              let id = generate()
+              draft.splice(index + 1, 0, {
+                id: id,
+                order: orderCount,
+                required: true,
+                title: "",
+                type: "select",
+                imagePath: "",
+                response: undefined,
+                subtitle: "",
+                options: [
+                  { id: generate(), name: id, value: '', ownerId: LoggedUser.userId, createdAt: new Date() },
+                  { id: generate(), name: id, value: "Outros", ownerId: LoggedUser.userId, createdAt: new Date() },
+                ],
+                createdAt: new Date(),
+                ownerId: LoggedUser.userId,
+              });
+            } else {
+              let id = generate()
+              draft.push({
+                id: id,
+                order: orderCount,
+                required: true,
+                title: "",
+                type: "select",
+                imagePath: "",
+                response: undefined,
+                subtitle: "",
+                options: [
+                  { id: generate(), name: id, value: '', ownerId: LoggedUser.userId, createdAt: new Date() },
+                  { id: generate(), name: id, value: "Outros", ownerId: LoggedUser.userId, createdAt: new Date() },
+                ],
+                createdAt: new Date(),
+                ownerId: LoggedUser.userId,
+              });
+            }
           }));
         break;
       case "multiple":
         setElements(elements =>
           produce(elements, draft => {
-            let id1 = generate();
-            let id2 = generate();
-            draft.push({
-              id: generate(),
-              order: orderCount,
-              required: true,
-              title: "",
-              type: "multiple",
-              imagePath: "",
-              response: [],
-              subtitle: "",
-              options: [
-                { id: id1, name: id1, value: '', ownerId: LoggedUser.userId, createdAt: new Date(), checked: false },
-                { id: id2, name: id2, value: "Outros", ownerId: LoggedUser.userId, createdAt: new Date(), checked: false },
-              ],
-              createdAt: new Date(),
-              ownerId: LoggedUser.userId,
-            });
+            if (index >= 0) {
+              let id1 = generate();
+              let id2 = generate();
+              draft.splice(index + 1, 0, {
+                id: generate(),
+                order: orderCount,
+                required: true,
+                title: "",
+                type: "multiple",
+                imagePath: "",
+                response: [],
+                subtitle: "",
+                options: [
+                  { id: id1, name: id1, value: '', ownerId: LoggedUser.userId, createdAt: new Date(), checked: false },
+                  { id: id2, name: id2, value: "Outros", ownerId: LoggedUser.userId, createdAt: new Date(), checked: false },
+                ],
+                createdAt: new Date(),
+                ownerId: LoggedUser.userId,
+              });
+            } else {
+              let id1 = generate();
+              let id2 = generate();
+              draft.push({
+                id: generate(),
+                order: orderCount,
+                required: true,
+                title: "",
+                type: "multiple",
+                imagePath: "",
+                response: [],
+                subtitle: "",
+                options: [
+                  { id: id1, name: id1, value: '', ownerId: LoggedUser.userId, createdAt: new Date(), checked: false },
+                  { id: id2, name: id2, value: "Outros", ownerId: LoggedUser.userId, createdAt: new Date(), checked: false },
+                ],
+                createdAt: new Date(),
+                ownerId: LoggedUser.userId,
+              });
+            }
           }));
         break;
       default:
@@ -251,27 +352,27 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
     }
   }
 
-  function handleCopy(e: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement) {    
+  function handleCopy(e: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement) {
     const idx = e.order;
-    let newElement = produce(e, draft=>{
+    let newElement = produce(e, draft => {
       let genId = generate();
-      draft.id=genId;
-      draft.ownerId=LoggedUser.userId;
-      draft.createdAt=new Date();      
+      draft.id = genId;
+      draft.ownerId = LoggedUser.userId;
+      draft.createdAt = new Date();
       if (draft.options) {
         if (draft.type === 'select') {
           let optSelect: Array<EVALUATION.SelectOptions> = [];
-          draft.options.forEach(item => optSelect.push({ ...item, name: genId, ownerId: LoggedUser.userId, createdAt: new Date() }));          
+          draft.options.forEach(item => optSelect.push({ ...item, name: genId, ownerId: LoggedUser.userId, createdAt: new Date() }));
         }
 
         if (draft.type === 'multiple') {
           let optMultiple: Array<EVALUATION.MultipleOptions> = [];
-          draft.options.forEach(item => optMultiple.push({ ...item, ownerId: LoggedUser.userId, createdAt: new Date(), checked: false }));          
+          draft.options.forEach(item => optMultiple.push({ ...item, ownerId: LoggedUser.userId, createdAt: new Date(), checked: false }));
         }
       }
     })
-    setElements(elements => produce(elements, draft =>{
-      draft.splice(idx+1, 0, newElement);
+    setElements(elements => produce(elements, draft => {
+      draft.splice(idx + 1, 0, newElement);
     }))
   }
 
@@ -286,7 +387,7 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
             onAlterOrderHandler={handleAlterOrder}
             onCopyHandler={handleCopy}
             buttonBar={<ElementButtonBar addElement={addElement} index={index} />}
-            index={index}            
+            index={index}
           />
         );
       case 'number':
@@ -296,7 +397,8 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
             onRemoveHandler={handleRemove}
             onUpdateHandler={handleUpdate}
             onAlterOrderHandler={handleAlterOrder}
-            onCopyHandler={handleCopy}            
+            onCopyHandler={handleCopy}
+            buttonBar={<ElementButtonBar addElement={addElement} index={index} />}
             index={index}
           />
         );
@@ -308,6 +410,7 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
             onUpdateHandler={handleUpdate}
             onAlterOrderHandler={handleAlterOrder}
             onCopyHandler={handleCopy}
+            buttonBar={<ElementButtonBar addElement={addElement} index={index} />}
             index={index}
           />
         );
@@ -319,6 +422,7 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
             onUpdateHandler={handleUpdate}
             onAlterOrderHandler={handleAlterOrder}
             onCopyHandler={handleCopy}
+            buttonBar={<ElementButtonBar addElement={addElement} index={index} />}
             index={index}
           />
         );
@@ -342,6 +446,7 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
             onUpdateHandler={handleUpdate}
             onAlterOrderHandler={handleAlterOrder}
             onCopyHandler={handleCopy}
+            buttonBar={<ElementButtonBar addElement={addElement} index={index} />}
             index={index}
           />
         );
