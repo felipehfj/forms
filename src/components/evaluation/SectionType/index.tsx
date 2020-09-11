@@ -13,7 +13,7 @@ import SelectType from "../../../components/evaluation/SelectType";
 import LoggedUser from '../../../components/general/LoggedUser';
 import ElementButtonBar from "../../../components/general/ElementButtonBar";
 import SectionButtonBar from "../../general/SectionButtonBar";
-import {Collapse} from 'react-collapse';
+import { Collapse } from 'react-collapse';
 import Editable from '../../general/Editable';
 import StringUtils from '../../../utils/StringUtils';
 import './styles.css';
@@ -24,11 +24,11 @@ interface SectionTypeProps {
   onUpdateHandler: Function,
   onCopyHandler: Function,
   onAlterOrderHandler: Function,
-  onAddSection:Function,
+  onAddSection: Function,
   index: number,
 }
 
-const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler, onCopyHandler, onRemoveHandler, onUpdateHandler,onAddSection, index }) => {
+const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler, onCopyHandler, onRemoveHandler, onUpdateHandler, onAddSection, index }) => {
   const [section, setSection] = useState<EVALUATION.SectionElement>(sectionElement);
   const [elements, setElements] = useState<Array<EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement>>(sectionElement.formElements);
   const titleInputRef = useRef<HTMLTextAreaElement>(null);
@@ -47,7 +47,7 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
     onUpdateHandler(section);
   }, [elements]);
 
-  useEffect(()=>{setSection({...section, order: index})},[index])
+  useEffect(() => { setSection({ ...section, order: index }) }, [index])
 
   useEffect(() => {
     onUpdateHandler(section)
@@ -223,8 +223,7 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
   }
 
   function handleAlterOrder(e: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement, type: "up" | "down") {
-    let idx = elements.indexOf(e);
-
+    let idx = e.order;
     if (idx > -1) {
       if (type === 'up') {
         if (idx === 0) {
@@ -252,30 +251,28 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
     }
   }
 
-  function handleCopy(e: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement) {
-    let idx = elements.indexOf(e);
-
-    if (idx > -1) {
-      setElements(elements => produce(elements, draft => {
-        let genId = generate();
-        if (e.options) {
-
-          if (e.type === 'select') {
-            let optSelect: Array<EVALUATION.SelectOptions> = [];
-            e.options.forEach(item => optSelect.push({ ...item, name: genId, ownerId: LoggedUser.userId, createdAt: new Date() }));
-            draft.splice(idx, 0, { ...e, id: genId, imagePath: '', options: optSelect, createdAt: new Date() });
-          }
-
-          if (e.type === 'multiple') {
-            let optMultiple: Array<EVALUATION.MultipleOptions> = [];
-            e.options.forEach(item => optMultiple.push({ ...item, ownerId: LoggedUser.userId, createdAt: new Date(), checked: false }));
-            draft.splice(idx, 0, { ...e, id: genId, imagePath: '', options: optMultiple, createdAt: new Date() });
-          }
-        } else {
-          draft.splice(idx, 0, { ...e, id: genId, imagePath: '', createdAt: new Date() });
+  function handleCopy(e: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement) {    
+    const idx = e.order;
+    let newElement = produce(e, draft=>{
+      let genId = generate();
+      draft.id=genId;
+      draft.ownerId=LoggedUser.userId;
+      draft.createdAt=new Date();      
+      if (draft.options) {
+        if (draft.type === 'select') {
+          let optSelect: Array<EVALUATION.SelectOptions> = [];
+          draft.options.forEach(item => optSelect.push({ ...item, name: genId, ownerId: LoggedUser.userId, createdAt: new Date() }));          
         }
-      }))
-    }
+
+        if (draft.type === 'multiple') {
+          let optMultiple: Array<EVALUATION.MultipleOptions> = [];
+          draft.options.forEach(item => optMultiple.push({ ...item, ownerId: LoggedUser.userId, createdAt: new Date(), checked: false }));          
+        }
+      }
+    })
+    setElements(elements => produce(elements, draft =>{
+      draft.splice(idx+1, 0, newElement);
+    }))
   }
 
   function selectElement(p: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement, index: number) {
@@ -288,7 +285,8 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
             onUpdateHandler={handleUpdate}
             onAlterOrderHandler={handleAlterOrder}
             onCopyHandler={handleCopy}
-            index={index}
+            buttonBar={<ElementButtonBar addElement={addElement} index={index} />}
+            index={index}            
           />
         );
       case 'number':
@@ -298,7 +296,7 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
             onRemoveHandler={handleRemove}
             onUpdateHandler={handleUpdate}
             onAlterOrderHandler={handleAlterOrder}
-            onCopyHandler={handleCopy}
+            onCopyHandler={handleCopy}            
             index={index}
           />
         );
@@ -332,6 +330,7 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
             onUpdateHandler={handleUpdate}
             onAlterOrderHandler={handleAlterOrder}
             onCopyHandler={handleCopy}
+            buttonBar={<ElementButtonBar addElement={addElement} index={index} />}
             index={index}
           />
         );
@@ -368,22 +367,22 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
         <div className="portlet light grey">
           <div className="portlet-title">
             <div className="caption">
-              Seção {index+1} {section.title ? StringUtils.truncate(` | ${section.title}`, 50 ) : '' }
+              Seção {index + 1} {section.title ? StringUtils.truncate(` | ${section.title}`, 50) : ''}
             </div>
             <div className="tools">
-            
+
             </div>
             <div className="actions">
               <div className="controller-container">
-                <div className="btn-container">                  
-                  <SectionButtonBar 
-                  element={section}
-                  onAlterOrder={(e,a)=>{onAlterOrderHandler(e,a)}}  
-                  onCopy={(e:any, i:number)=>{onCopyHandler(e, index)}}  
-                  onRemove={(e:any,i:number)=>{onRemoveHandler(e,i)}}  
-                  onAdd={()=>onAddSection()}
-                  onCollapse={() => setIsOpened(isOpened => !isOpened)}
-                  index={index}
+                <div className="btn-container">
+                  <SectionButtonBar
+                    element={section}
+                    onAlterOrder={(e, a) => { onAlterOrderHandler(e, a) }}
+                    onCopy={(e: any, i: number) => { onCopyHandler(e, index) }}
+                    onRemove={(e: any, i: number) => { onRemoveHandler(e, i) }}
+                    onAdd={() => onAddSection()}
+                    onCollapse={() => setIsOpened(isOpened => !isOpened)}
+                    index={index}
                   />
                 </div>
               </div>
@@ -391,80 +390,87 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
             </div>
           </div>
           <Collapse isOpened={isOpened}>
-          <div className="portlet-body">
-            <div className="">
+            <div className="portlet-body">
               <div className="">
-                <h2>
-                  <Editable
-                    text={section.title}
-                    placeholder="Título da seção"
-                    type="textarea"
-                    childRef={titleInputRef}
-                    title="Clique para editar"
-                  >
-                    <textarea
-                      className="form-control"
-                      ref={titleInputRef}
-                      name="title"
-                      value={section.title}
+                <div className="">
+                  <h2>
+                    <Editable
+                      text={section.title}
                       placeholder="Título da seção"
-                      onChange={(e) => {
-                        const { name, value } = e.target;
-                        setSection({ ...section, [name]: value })
-                      }} />
-                  </Editable>
-                </h2>
-              </div>
-              <div className="">
-                <h4>
-                  <Editable
-                    text={section.subtitle ? section.subtitle : ''}
-                    placeholder="Descrição da seção"
-                    type="textarea"
-                    childRef={subtitleInputRef}
-                    title="Clique para editar"
-                  >
-                    <textarea
-                      className="form-control"
+                      type="textarea"
+                      childRef={titleInputRef}
+                      title="Clique para editar"
+                    >
+                      <textarea
+                        className="form-control"
+                        ref={titleInputRef}
+                        name="title"
+                        value={section.title}
+                        placeholder="Título da seção"
+                        onChange={(e) => {
+                          const { name, value } = e.target;
+                          setSection({ ...section, [name]: value })
+                        }} />
+                    </Editable>
+                  </h2>
+                </div>
+                <div className="">
+                  <h4>
+                    <Editable
+                      text={section.subtitle ? section.subtitle : ''}
                       placeholder="Descrição da seção"
-                      ref={subtitleInputRef}
-                      name="subtitle"
-                      value={section.subtitle}
-                      onChange={(e) => {
-                        const { name, value } = e.target;
-                        setSection({ ...section, [name]: value })
-                      }} />
-                  </Editable>
-                </h4>
+                      type="textarea"
+                      childRef={subtitleInputRef}
+                      title="Clique para editar"
+                    >
+                      <textarea
+                        className="form-control"
+                        placeholder="Descrição da seção"
+                        ref={subtitleInputRef}
+                        name="subtitle"
+                        value={section.subtitle}
+                        onChange={(e) => {
+                          const { name, value } = e.target;
+                          setSection({ ...section, [name]: value })
+                        }} />
+                    </Editable>
+                  </h4>
+                </div>
               </div>
-            </div>
 
-            <div className="section-elements-container">
-              {
-                section.formElements.length > 0 ?
-                  section.formElements.map((p, index) => {
-                    return (
-                      <div key={p.id}>
-                        {selectElement(p, index)}
-                        <div className="controller-container">
-                          <div className="btn-container">
-                            <ElementButtonBar addElement={addElement} index={index} />
+              <div className="section-elements-container">
+                {
+                  section.formElements.length > 0 ?
+                    section.formElements.map((p, index) => {
+                      return (
+                        <div key={p.id}>
+                          {selectElement(p, index)}
+                          <div className="controller-container">
+                            <div className="btn-container">
+                              <ElementButtonBar addElement={addElement} index={index} />
+                            </div>
                           </div>
                         </div>
+                      )
+                    })
+                    :
+                    <div className="controller-container">
+                      <div className="btn-container">
+                        <ElementButtonBar addElement={addElement} index={index} />
                       </div>
-                    )
-                  })
-                  :
-                  <div className="controller-container">
-                    <div className="btn-container">
-                      <ElementButtonBar addElement={addElement} index={index} />
                     </div>
-                  </div>
-              }
+                }
+              </div>
             </div>
-          </div>
           </Collapse>
-        </div>        
+        </div>
+
+        {/* <pre>
+          {JSON.stringify(section, null, 2)}
+        </pre>
+        <pre>
+          {JSON.stringify(elements, null, 2)}  
+        </pre> */}
       </div>
     </Fragment>
   );

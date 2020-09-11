@@ -4,9 +4,9 @@
 .portlet .portlet-title{
     height: 1rem;
 }
-.portlet-title:hover .action-button-group{
+/* .portlet-title:hover .action-button-group{
     display: inline-block;
-}
+} */
 
 
 .mb-10{

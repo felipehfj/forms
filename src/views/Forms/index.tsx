@@ -41,7 +41,7 @@ const Forms: React.FC = () => {
         type: 'section'
       }],
       status: 'elaboration',
-      theme: 'red',
+      theme: 'lightblue',
       tipo: "survey",
     });
 
@@ -173,7 +173,7 @@ const Forms: React.FC = () => {
         })}
       </div>
       {/* <pre>
-        {JSON.stringify(sections, null, 2)}
+        {JSON.stringify(form, null, 2)}
       </pre> */}
 
       <Modal
@@ -185,15 +185,15 @@ const Forms: React.FC = () => {
         contentLabel="Example Modal"
       >
         <div>
-          <button type="button" className="btn btn-secondary" onClick={() => {setForm(form => produce(form, draft=>{draft.theme='red'})) }}>Vermelho</button>
-          <button type="button" className="btn btn-secondary" onClick={() => {setForm(form => produce(form, draft=>{draft.theme='blue'})) }}>Azul</button>
-          <button type="button" className="btn btn-secondary" onClick={() => {setForm(form => produce(form, draft=>{draft.theme='green'})) }}>Verde</button>
+          <button type="button" className="btn" style={{backgroundColor: 'red'}} onClick={() => {setForm(form => produce(form, draft=>{draft.theme='red'})) }}>Vermelho</button>
+          <button type="button" className="btn" style={{backgroundColor: 'blue'}}onClick={() => {setForm(form => produce(form, draft=>{draft.theme='blue'})) }}>Azul</button>
+          <button type="button" className="btn" style={{backgroundColor: 'green'}}onClick={() => {setForm(form => produce(form, draft=>{draft.theme='lightgreen'})) }}>Verde</button>
+          <button type="button" className="btn" style={{backgroundColor: 'rgba(255,0,0,0.5)'}}onClick={() => {setForm(form => produce(form, draft=>{draft.theme='rgba(255,0,0,0.2)'})) }}>Vermelho Claro</button>
+          <button type="button" className="btn" style={{backgroundColor: 'lightblue'}}onClick={() => {setForm(form => produce(form, draft=>{draft.theme='lightblue'})) }}>Azul claro</button>
+          <button type="button" className="btn" style={{backgroundColor: 'lightgreen'}}onClick={() => {setForm(form => produce(form, draft=>{draft.theme='lightgreen'})) }}>Verde Claro</button>
         </div>
         <button type="button" className="btn btn-secondary" style={{ width: "100%" }} onClick={closeModal}>ok</button>
-      </Modal>
-      {/* <pre>
-        {JSON.stringify(form, null, 2)}
-      </pre> */}
+      </Modal>      
     </Fragment>
   );
 }

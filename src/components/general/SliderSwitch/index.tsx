@@ -6,7 +6,7 @@ interface SliderSwitchProps{
     width: number,
     name: string,
     checked: boolean,
-    onChange: Function
+    onChange: Function,    
 }
 
 
@@ -17,7 +17,7 @@ const SliderSwitch: React.FC<SliderSwitchProps> = (props: SliderSwitchProps) => 
             <Switch
                 height={props.height ? props.height : 22}
                 width={props.width ? props.width : 44}                
-                name={props.name}
+                name={props.name}                
                 checked={props.checked}
                 onChange={(e) => {
                     props.onChange(e)
