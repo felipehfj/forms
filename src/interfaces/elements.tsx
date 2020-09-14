@@ -3,10 +3,11 @@ interface IOption {
   name: string,
   value: string,
   ownerId: string,
-  createdAt: Date,
+  createdAt: Date,  
 }
 
 interface SelectOptions extends IOption {
+  navigation?: string,
 }
 
 interface MultipleOptions extends IOption {
@@ -75,7 +76,9 @@ export declare namespace EVALUATION {
   }
 
   interface SectionElement extends IBaseElement {
-    formElements: Array<EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement>
+    formElements: Array<EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement>,
+    prevStep: string,
+    nextStep: string,    
   }
 
   interface SelectOptions extends IOption {
