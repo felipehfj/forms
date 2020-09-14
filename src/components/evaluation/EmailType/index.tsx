@@ -142,6 +142,7 @@ const EmailType: FC<EmailTypeProps> = ({ emailElement, onRemoveHandler, onAlterO
                 <div className="form-group">
 
                   <input
+                    disabled
                     type="email"
                     style={{ width: '100%', resize: 'none', padding: '2rem' }}
                     name="response"

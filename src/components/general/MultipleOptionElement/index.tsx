@@ -1,7 +1,6 @@
 import React, { FC, Fragment, useState, useEffect } from 'react';
-import { FaTrash, FaArrowUp, FaArrowDown, FaCopy } from 'react-icons/fa';
+import { FaTrash, FaArrowUp, FaArrowDown, FaCopy, FaPlus } from 'react-icons/fa';
 import { EVALUATION } from '../../../interfaces/elements';
-import produce from 'immer';
 
 import './styles.css';
 
@@ -11,19 +10,21 @@ interface MultipleOptionElementProps {
   onRemoveHandler: Function,
   onCopyHandler: Function,
   onAlterOrderHandler: Function,
-  //onSelectHandler:Function,
+  onAddElement?: Function,
+  designMode?:boolean,
   index: number
 }
 
-const MultipleOptionElement: FC<MultipleOptionElementProps> = ({ optionElement, onAlterOrderHandler, onCopyHandler, onRemoveHandler, onUpdateHandler, index }) => {
+const MultipleOptionElement: FC<MultipleOptionElementProps> = ({ optionElement, onAlterOrderHandler, onCopyHandler, onRemoveHandler, onUpdateHandler, onAddElement, designMode=true, index }) => {
   const [option, setOption] = useState<EVALUATION.MultipleOptions>(optionElement);
 
-  useEffect(() => { 
-    setOption(optionElement => optionElement);    
-   }, [optionElement]);
+  useEffect(() => {
+    setOption(optionElement => optionElement);
+  }, [optionElement]);
 
-  useEffect(() => {     
-    update(option) }, [option]);
+  useEffect(() => {
+    update(option)
+  }, [option]);
 
   const alterOrder = (optionElement: EVALUATION.MultipleOptions, action: "up" | "down") => {
     onAlterOrderHandler(optionElement, action);
@@ -47,37 +48,38 @@ const MultipleOptionElement: FC<MultipleOptionElementProps> = ({ optionElement, 
         <div className="question-choice-label inline-display">
           <div className="question-choice-icon-group">
             <input
+              disabled={designMode}
               aria-label={option.name}
               className="design-question-choice-icon"
               type="checkbox"
-              name={option.name}            
-              value={option.value}              
-              onChange={(e) => {                
-                setOption({...option, checked: !option.checked });                 
-                }
-              } 
-              defaultChecked={option.checked}                      
-              />
+              name={option.name}
+              value={option.value}
+              onChange={(e) => {
+                setOption({ ...option, checked: !option.checked });
+              }
+              }
+              defaultChecked={option.checked}
+            />
           </div>
         </div>
         <div className="question-choice-option-textbox inline-display">
-          <input 
-          aria-label="Texto da Opção de Escolha" 
-          className="form-control" 
-          placeholder="Insira um nome para esta opção." 
-          maxLength={1000}    
-          name={option.name}
-          value={option.value}
-          onChange={(e) => {
-            const {value} = e.target;
-            setOption({...option, value: value});
-          }}
+          <input
+            aria-label="Texto da Opção de Escolha"
+            className="form-control"
+            placeholder="Insira um nome para esta opção."
+            maxLength={1000}
+            name={option.name}
+            value={option.value}
+            onChange={(e) => {
+              const { value } = e.target;
+              setOption({ ...option, value: value });
+            }}
           />
         </div>
 
         <div className="question-btn-container">
           <div className='button-group'>
-            <button
+            <button              
               type="button"
               className="btn btn-link"
               title="Mover elemento para uma posição anterior"
@@ -108,6 +110,18 @@ const MultipleOptionElement: FC<MultipleOptionElementProps> = ({ optionElement, 
               onClick={() => { remove(option) }}
             ><FaTrash />
             </button>
+            {
+              onAddElement ?
+                <button
+                  type="button"
+                  className="btn btn-link"
+                  title="Adicionar novo elemento"
+                  onClick={() => { onAddElement(index) }}
+                ><FaPlus />
+                </button>
+                :
+                ''
+            }
           </div>
         </div>
       </div>

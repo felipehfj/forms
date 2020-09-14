@@ -153,6 +153,7 @@ const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlt
                       <div key={item.id} >
                         <SelectOptionElement
                           index={index}
+                          designMode={true}
                           onAlterOrderHandler={(elementReceived: EVALUATION.SelectOptions, action: "up" | "down") => {
                             let options = produce(element.options, draft => {
                               let idx = element.options.indexOf(elementReceived);
@@ -221,18 +222,23 @@ const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlt
                           onSelectHandler={(e: EVALUATION.SelectOptions) => {
                             handleElementChange('response', e);
                           }}
+                          onAddElement={(index: number) => {
+                            if (index >= 0) {
+                              let options = produce(element.options, draft => {
+                                draft.splice(index + 1, 0, { id: generate(), name: element.id, value: "", ownerId: LoggedUser.userId, createdAt: new Date() })
+                              })
+                              handleElementChange('options', options);
+                            } else {
+                              let options = produce(element.options, draft => {
+                                draft.push({ id: generate(), name: element.id, value: "", ownerId: LoggedUser.userId, createdAt: new Date() })
+                              })
+                              handleElementChange('options', options);
+                            }
+                          }}
                         />
                       </div>
                     ))
                   }
-                  <button type="button" onClick={() => {
-                    let options = produce(element.options, draft => {
-                      draft.push({ id: generate(), name: element.id, value: "", ownerId: LoggedUser.userId, createdAt: new Date() })
-                    })
-                    handleElementChange('options', options);
-
-                  }}>add</button>
-
                 </div>
               </div>
             </div>

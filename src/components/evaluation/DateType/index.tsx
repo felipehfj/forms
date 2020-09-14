@@ -165,6 +165,7 @@ const TextType: FC<DateTypeProps> = ({ dateElement, onRemoveHandler, onAlterOrde
                 <div className="form-group">
 
                   <DatePicker
+                    disabled
                     className="form-control"
                     locale={br}
                     dateFormat="dd/MM/yyyy"

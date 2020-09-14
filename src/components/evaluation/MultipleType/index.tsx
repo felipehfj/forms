@@ -151,11 +151,11 @@ const MultipleType: FC<MultipleTypeProps> = ({ multipleElement, onRemoveHandler,
                     element.options.map((item, index) => (
                       <div key={item.id} >
                         <MultipleOptionElement
+                          designMode={true}
                           index={index}
                           onAlterOrderHandler={(elementReceived: EVALUATION.MultipleOptions, action: "up" | "down") => {
                             let options = produce(element.options, draft => {
-                              let idx = element.options.indexOf(elementReceived);
-                              console.log(idx);
+                              let idx = element.options.indexOf(elementReceived);                             
 
                               if (idx > -1) {
                                 if (action === 'up') {
@@ -217,19 +217,27 @@ const MultipleType: FC<MultipleTypeProps> = ({ multipleElement, onRemoveHandler,
                             setIsUpdated(true);
                           }}
                           optionElement={item}
+                          onAddElement={(index: number) => {
+                            if (index >= 0) {
+                              let options = produce(element.options, draft => {
+                                const id = generate();
+                                draft.splice(index + 1, 0, { id: id, name: id, value: "", ownerId: LoggedUser.userId, createdAt: new Date(), checked: false });
+                              });
+
+                              handleElementChange('options', options);
+                            } else {
+                              let options = produce(element.options, draft => {
+                                const id = generate();
+                                draft.push({ id: id, name: id, value: "", ownerId: LoggedUser.userId, createdAt: new Date(), checked: false });
+                              });
+
+                              handleElementChange('options', options);
+                            }
+                          }}
                         />
                       </div>
                     ))
                   }
-                  <button type="button" onClick={() => {
-                    let options = produce(element.options, draft => {
-                      const id = generate();
-                      draft.push({ id: id, name: id, value: "", ownerId: LoggedUser.userId, createdAt: new Date(), checked: false });
-                    });
-
-                    handleElementChange('options', options);
-                  }}>add</button>
-
                 </div>
               </div>
             </div>

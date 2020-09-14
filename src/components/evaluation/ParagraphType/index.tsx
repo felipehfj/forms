@@ -141,6 +141,7 @@ const TextType: FC<ParagraphTypeProps> = ({ paragraphElement, onRemoveHandler, o
                 <div className="form-group">
 
                   <textarea
+                    disabled
                     style={{ width: '100%', resize: 'none', padding: '2rem' }}
                     name="response"
                     value={element.response}

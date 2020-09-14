@@ -141,6 +141,7 @@ const TextType: FC<NumberTypeProps> = ({ numberElement, onRemoveHandler, onAlter
                 <div className="form-group">
 
                   <input
+                    disabled
                     type="number"
                     style={{ width: '100%', resize: 'none', padding: '2rem' }}
                     name="response"

@@ -1,5 +1,5 @@
 import React, { FC, Fragment, useState, useEffect } from 'react';
-import { FaTrash, FaArrowUp, FaArrowDown, FaCopy } from 'react-icons/fa';
+import { FaTrash, FaArrowUp, FaArrowDown, FaCopy, FaPlus } from 'react-icons/fa';
 import { EVALUATION } from '../../../interfaces/elements';
 import produce from 'immer';
 
@@ -12,16 +12,19 @@ interface SelectOptionElementProps {
   onCopyHandler: Function,
   onAlterOrderHandler: Function,
   onSelectHandler: Function,
+  onAddElement?: Function,
+  designMode?: boolean,
   index: number
 }
 
-const SelectOptionElement: FC<SelectOptionElementProps> = ({ optionElement, onAlterOrderHandler, onCopyHandler, onRemoveHandler, onUpdateHandler, onSelectHandler, index }) => {
+const SelectOptionElement: FC<SelectOptionElementProps> = ({ optionElement, onAlterOrderHandler, onCopyHandler, onRemoveHandler, onUpdateHandler, onSelectHandler, onAddElement, designMode=true, index }) => {
   const [option, setOption] = useState<EVALUATION.SelectOptions>(optionElement);
 
   useEffect(() => { setOption(optionElement => optionElement) }, [optionElement]);
 
-  useEffect(() => {     
-    update(option) }, [option]);
+  useEffect(() => {
+    update(option)
+  }, [option]);
 
   const alterOrder = (optionElement: EVALUATION.SelectOptions, action: "up" | "down") => {
     onAlterOrderHandler(optionElement, action);
@@ -39,7 +42,7 @@ const SelectOptionElement: FC<SelectOptionElementProps> = ({ optionElement, onAl
     onUpdateHandler(optionElement);
   }
 
-  const onSelect = (optionElement: EVALUATION.SelectOptions) =>{
+  const onSelect = (optionElement: EVALUATION.SelectOptions) => {
     onSelectHandler(optionElement)
   }
 
@@ -49,27 +52,28 @@ const SelectOptionElement: FC<SelectOptionElementProps> = ({ optionElement, onAl
         <div className="question-choice-label inline-display">
           <div className="question-choice-icon-group">
             <input
+              disabled={designMode}
               aria-label={option.name}
               className="design-question-choice-icon"
               type="radio"
-              name={option.name}            
-              value={option.value}              
+              name={option.name}
+              value={option.value}
               onChange={() => onSelect(option)}
-              />
+            />
           </div>
         </div>
         <div className="question-choice-option-textbox inline-display">
-          <input 
-          aria-label="Texto da Opção de Escolha" 
-          className="form-control" 
-          placeholder="Insira um nome para esta opção." 
-          maxLength={1000}    
-          name={option.name}
-          value={option.value}
-          onChange={(e) => {
-            const {value} = e.target;
-            setOption({...option, value: value});
-          }}
+          <input
+            aria-label="Texto da Opção de Escolha"
+            className="form-control"
+            placeholder="Insira um nome para esta opção."
+            maxLength={1000}
+            name={option.name}
+            value={option.value}
+            onChange={(e) => {
+              const { value } = e.target;
+              setOption({ ...option, value: value });
+            }}
           />
         </div>
 
@@ -106,6 +110,19 @@ const SelectOptionElement: FC<SelectOptionElementProps> = ({ optionElement, onAl
               onClick={() => { remove(option) }}
             ><FaTrash />
             </button>
+            {
+              onAddElement ?
+                <button
+                  type="button"
+                  className="btn btn-link"
+                  title="Adicionar novo elemento"
+                  onClick={() => { onAddElement(index) }}
+                ><FaPlus />
+                </button>
+                :
+                ''
+            }
+
           </div>
         </div>
       </div>

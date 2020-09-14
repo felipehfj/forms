@@ -51,22 +51,15 @@ const TextType: FC<TextTypeProps> = ({ textElement, onRemoveHandler, onAlterOrde
   })
 
   const alterOrder = (element: EVALUATION.TextElement, action: "up" | "down") => {
-    if (onAlterOrderHandler) {
-      console.log(element, action);
-      onAlterOrderHandler(element, action);
-    }
+    onAlterOrderHandler(element, action);
   }
 
   const copy = (element: EVALUATION.TextElement) => {
-    if (onCopyHandler) {
-      onCopyHandler(element);
-    }
+    onCopyHandler(element);
   }
 
   const remove = (element: EVALUATION.TextElement) => {
-    if (onRemoveHandler) {
-      onRemoveHandler(element);
-    }
+    onRemoveHandler(element);
   }
 
   const handleElementChange = (name: any, value: any) => {
@@ -144,6 +137,7 @@ const TextType: FC<TextTypeProps> = ({ textElement, onRemoveHandler, onAlterOrde
                 <div className="form-group">
 
                   <input
+                    disabled
                     type="text"
                     style={{ width: '100%', resize: 'none', padding: '2rem' }}
                     name="response"
