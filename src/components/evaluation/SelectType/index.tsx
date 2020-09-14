@@ -1,14 +1,13 @@
 import React, { Fragment, FC, useState, useEffect, useRef } from 'react';
 import { produce } from "immer";
+import { generate } from 'shortid';
 import SliderSwitch from '../../general/SliderSwitch';
 import ControlElementButtonBar from '../../general/ControlElementButtonBar';
-import { FaArrowUp, FaArrowDown, FaTrash, FaCopy } from 'react-icons/fa';
-import './styles.css';
 import ImageElement from '../../general/ImageElement';
 import SelectOptionElement from '../../general/SelectOptionElement';
 import LoggedUser from '../../general/LoggedUser';
 import { EVALUATION } from '../../../interfaces/elements';
-import { generate } from 'shortid';
+import './styles.css';
 
 interface SelectTypeProps {
   selectElement: EVALUATION.SelectElement,
@@ -24,7 +23,6 @@ const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlt
   const [isUpdated, setIsUpdated] = useState<boolean>(false);
   const [isSelected, setSelected] = useState<boolean>(false);
   const node = useRef<HTMLDivElement>(null);
-
 
   const [element, setElement] = useState<EVALUATION.SelectElement>(selectElement)
 
@@ -158,7 +156,6 @@ const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlt
                           onAlterOrderHandler={(elementReceived: EVALUATION.SelectOptions, action: "up" | "down") => {
                             let options = produce(element.options, draft => {
                               let idx = element.options.indexOf(elementReceived);
-                              console.log(draft, elementReceived)
 
                               if (idx > -1) {
                                 if (action === 'up') {
@@ -197,16 +194,21 @@ const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlt
 
                           }}
                           onRemoveHandler={(e: EVALUATION.SelectOptions) => {
-                            let options = produce(element.options, draft => {
-                              return draft.filter(item => item.id !== e.id);
-                            })
-                            handleElementChange('options', options);
+                            const newElement = produce(element, draft => {
+                              draft.options = produce(element.options, draft => {
+                                return draft.filter(item => item.id !== e.id);
+                              })
 
-                            if (element.response) {
-                              if (element.response.id === e.id) {
-                                handleElementChange('response', undefined);
+                              if (element.response) {
+                                if (element.response.id === e.id) {
+                                  draft.response = undefined;
+                                }
                               }
-                            }
+                            })
+
+                            setElement(newElement);
+                            setIsUpdated(true);
+
                           }}
                           onUpdateHandler={(e: EVALUATION.SelectOptions) => {
                             let options = produce(element.options, draft => {

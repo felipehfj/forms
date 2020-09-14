@@ -1,13 +1,13 @@
-import React, { Fragment, FC, useState, useEffect } from 'react';
+import React, { Fragment, FC, useState, useEffect, useRef } from 'react';
 import { produce } from "immer";
+import { generate } from 'shortid';
 import SliderSwitch from '../../general/SliderSwitch';
-import { FaArrowUp, FaArrowDown, FaTrash, FaCopy } from 'react-icons/fa';
-import './styles.css';
+import ControlElementButtonBar from '../../general/ControlElementButtonBar';
 import ImageElement from '../../general/ImageElement';
 import MultipleOptionElement from '../../general/MultipleOptionElement';
 import LoggedUser from '../../general/LoggedUser';
 import { EVALUATION } from '../../../interfaces/elements';
-import { generate } from 'shortid';
+import './styles.css';
 
 interface MultipleTypeProps {
   multipleElement: EVALUATION.MultipleElement,
@@ -15,10 +15,15 @@ interface MultipleTypeProps {
   onUpdateHandler: Function,
   onCopyHandler: Function,
   onAlterOrderHandler: Function,
+  buttonBar?: any,
   index: number,
 }
 
-const MultipleType: FC<MultipleTypeProps> = ({ multipleElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler, index }: MultipleTypeProps) => {
+const MultipleType: FC<MultipleTypeProps> = ({ multipleElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler, buttonBar, index }: MultipleTypeProps) => {
+  const [isUpdated, setIsUpdated] = useState<boolean>(false);
+  const [isSelected, setSelected] = useState<boolean>(false);
+  const node = useRef<HTMLDivElement>(null);
+
   const [element, setElement] = useState<EVALUATION.MultipleElement>(multipleElement)
 
   useEffect(() => {
@@ -28,32 +33,8 @@ const MultipleType: FC<MultipleTypeProps> = ({ multipleElement, onRemoveHandler,
   }, [multipleElement])
 
   useEffect(() => {
-    onUpdateHandler(element);
-  }, [element])
-
-  useEffect(() => {
     setElement({ ...element, order: index })
   }, [index])
-
-  const addOption = () => {
-    setElement(element => produce(element, draft => {
-      let id = generate();
-      draft.options.push({ id: id, name: id, value: "", ownerId: LoggedUser.userId, createdAt: new Date(), checked: false });
-    }))
-  }
-
-  const removeOption = (option: EVALUATION.MultipleOptions) => {
-    setElement(element =>
-      produce(element, draft => {
-        draft.options = draft.options.filter(x => x.id !== option.id);
-        draft.response = draft.options.filter(x => x.id !== option.id);
-      }
-      ));
-  };
-
-  useEffect(() => {
-    onUpdateHandler(element);
-  }, [element])
 
   const alterOrder = (element: EVALUATION.MultipleElement, action: "up" | "down") => {
     if (onAlterOrderHandler) {
@@ -73,50 +54,48 @@ const MultipleType: FC<MultipleTypeProps> = ({ multipleElement, onRemoveHandler,
     }
   }
 
+  const handleFocusClick = (e: any) => {
+    if (node && node.current && node.current.contains(e.target)) {
+      setSelected(true);
+      return;
+    }
+    if (isUpdated) {
+      onUpdateHandler(element);
+      setIsUpdated(false);
+    }
+    setSelected(false);
+  }
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleFocusClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleFocusClick)
+    }
+  })
+
+  const handleElementChange = (name: any, value: any) => {
+    setElement({ ...element, [name]: value });
+    setIsUpdated(true);
+  }
   return (
     <Fragment>
-      <div className="portlet light">
+      <div className="portlet light" ref={node} style={isSelected ? { boxShadow: 'inset 0 0 1rem rgba(0,0,0,0.7)' } : {}}>
         <div className="portlet-title">
-          <div className="caption">{element.order}</div>
           <div className="actions">
-            <div className='action-button-group'>
-              <button
-                type="button"
-                className="btn btn-link"
-                title="Mover elemento para uma posição anterior"
-                onClick={() => { alterOrder(element, "up"); }}
-              >
-                <FaArrowUp />
-              </button>
-              <button
-                type="button"
-                className="btn btn-link"
-                title="Mover elemento para uma posição posterior"
-                onClick={() => { alterOrder(element, "down"); }}
-              >
-                <FaArrowDown />
-              </button>
-              <button
-                type="button"
-                className="btn btn-link"
-                title="Copiar elemento"
-                onClick={() => { copy(element); }}
-              >
-                <FaCopy />
-              </button>
-              <button
-                type="button"
-                className="btn btn-link"
-                title="Remover elemento"
-                onClick={() => { remove(element); }}
-              ><FaTrash />
-              </button>
+            <div className='design-multiple-action-button-group' style={isSelected ? { display: 'inline-block' } : {}}>
+              <ControlElementButtonBar
+                onAlterOrderUp={() => alterOrder(element, "up")}
+                onAlterOrderDown={() => alterOrder(element, "down")}
+                onCopy={() => copy(element)}
+                onRemove={() => remove(element)}
+              />
             </div>
           </div>
         </div>
         <div className="portlet-body">
 
-          <div className="title-area">
+          <div className="design-multiple-title-area">
             <div className="row">
               <div className="col-xs-12 col-sm-12 col-md-8 col-lg-8">
                 <div className="form-group">
@@ -131,7 +110,7 @@ const MultipleType: FC<MultipleTypeProps> = ({ multipleElement, onRemoveHandler,
                     className="form-control"
                     onChange={e => {
                       const { name, value } = e.target;
-                      setElement({ ...element, [name]: value })
+                      handleElementChange(name, value);
                     }}
                   />
 
@@ -147,19 +126,24 @@ const MultipleType: FC<MultipleTypeProps> = ({ multipleElement, onRemoveHandler,
                     placeholder="Descrição da pergunta"
                     onChange={e => {
                       const { name, value } = e.target;
-                      setElement({ ...element, [name]: value })
+                      handleElementChange(name, value);
                     }}
                   />
                 </div>
               </div>
 
               <div className="col-xs-12 col-sm-12 col-md-4 col-lg-4">
-                <ImageElement imgSrc={element.imagePath} onChange={((e: string) => { setElement({ ...element, imagePath: e }) })} />
+                <ImageElement
+                  imgSrc={element.imagePath}
+                  onChange={(e: string) => {
+                    handleElementChange('imagePath', e);
+                  }}
+                />
               </div>
             </div>
           </div>
 
-          <div className="response-area">
+          <div className="design-multiple-response-area">
             <div className="row">
               <div className="col-xs-12" >
                 <div className="form-group">
@@ -169,60 +153,82 @@ const MultipleType: FC<MultipleTypeProps> = ({ multipleElement, onRemoveHandler,
                         <MultipleOptionElement
                           index={index}
                           onAlterOrderHandler={(elementReceived: EVALUATION.MultipleOptions, action: "up" | "down") => {
-                            let idx = element.options.indexOf(elementReceived);
+                            let options = produce(element.options, draft => {
+                              let idx = element.options.indexOf(elementReceived);
+                              console.log(idx);
 
-                            if (idx > -1) {
-                              if (action === 'up') {
-                                if (idx === 0) {
-                                  return;
-                                } else {
-                                  let anterior = element.options[idx - 1];
-                                  setElement(element => produce(element, draft => {
-                                    draft.options[idx - 1] = elementReceived;
-                                    draft.options[idx] = anterior;
+                              if (idx > -1) {
+                                if (action === 'up') {
+                                  if (idx === 0) { return }
+                                  else {
+                                    let anterior = draft[idx - 1];
 
-                                    draft.response = draft.options;
-                                  }))
+                                    draft[idx - 1] = elementReceived;
+                                    draft[idx] = anterior;
+                                  }
+                                }
+
+                                if (action === 'down') {
+                                  if (idx === draft.length - 1) { return }
+                                  else {
+                                    let posterior = draft[idx + 1];
+
+                                    draft[idx + 1] = elementReceived;
+                                    draft[idx] = posterior;
+                                  }
                                 }
                               }
+                            })
+                            handleElementChange('options', options);
 
-                              if (action === 'down') {
-                                if (idx === element.options.length - 1) {
-                                  return;
-                                } else {
-                                  let posterior = element.options[idx + 1];
-                                  setElement(elements => produce(elements, draft => {
-                                    draft.options[idx + 1] = elementReceived;
-                                    draft.options[idx] = posterior;
-
-                                    draft.response = draft.options;
-                                  }))
-                                }
-                              }
-                            }
                           }}
                           onCopyHandler={(e: EVALUATION.MultipleOptions) => {
-                            let idx = element.options.indexOf(e);
-                            if (idx > -1) {
-                              setElement(element => produce(element, draft => {
+                            let options = produce(element.options, draft => {
+                              let idx = element.options.indexOf(e);
+                              if (idx > - 1) {
                                 let id = generate();
-                                draft.options.splice(idx, 0, { ...e, id: id, name: id });
-                              }))
-                            }
+                                draft.splice(idx + 1, 0, { ...e, id: id, name: id })
+                              }
+                            })
+
+                            handleElementChange('options', options);
                           }}
-                          onRemoveHandler={(e: EVALUATION.MultipleOptions) => { removeOption(e) }}
+                          onRemoveHandler={(e: EVALUATION.MultipleOptions) => {
+                            const newElement = produce(element, draft => {
+                              draft.options = produce(element.options, draft1 => {
+                                return draft1.filter(item => item.id !== e.id);
+                              })
+
+                              draft.response = produce(element.response, draft1 => {
+                                return draft1.filter(item => item.id !== e.id)
+                              })
+                            })
+
+                            setElement(newElement);
+                            setIsUpdated(true);
+                          }}
                           onUpdateHandler={(e: EVALUATION.MultipleOptions) => {
-                            setElement(element => produce(element, draft => {
-                              draft.options[index] = e;
-                              draft.response[index] = e;
-                            }))
+                            const newElement = produce(element, draft => {
+                              draft.options[index] = e
+                              draft.response[index] = e
+                            })
+
+                            setElement(newElement);
+                            setIsUpdated(true);
                           }}
                           optionElement={item}
                         />
                       </div>
                     ))
                   }
-                  <button type="button" onClick={() => addOption()}>add</button>
+                  <button type="button" onClick={() => {
+                    let options = produce(element.options, draft => {
+                      const id = generate();
+                      draft.push({ id: id, name: id, value: "", ownerId: LoggedUser.userId, createdAt: new Date(), checked: false });
+                    });
+
+                    handleElementChange('options', options);
+                  }}>add</button>
 
                 </div>
               </div>
@@ -230,11 +236,14 @@ const MultipleType: FC<MultipleTypeProps> = ({ multipleElement, onRemoveHandler,
 
           </div>
 
-          <div className='area-separator' />
+          <div className='design-multiple-area-separator' />
 
-          <div className="config-area">
+          <div className="design-multiple-config-area">
             <div className="row">
-              <div className="col-md-offset-8 col-md-4">
+              <div className="col-md-8" style={{ marginTop: '2rem', marginBottom: '2rem', paddingBottom: 10 }}>
+                {isSelected ? buttonBar : ''}
+              </div>
+              <div className="col-md-4">
                 <div className="form-group" style={{ marginTop: '2rem', marginBottom: '2rem', paddingBottom: 10 }}>
                   <label
                     className="mt-checkbox"

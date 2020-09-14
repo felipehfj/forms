@@ -1,4 +1,3 @@
-
 import React, { FC, Fragment, useState, useEffect, useRef } from "react";
 import { generate } from "shortid";
 import { produce } from "immer";
@@ -458,6 +457,7 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
             onUpdateHandler={handleUpdate}
             onAlterOrderHandler={handleAlterOrder}
             onCopyHandler={handleCopy}
+            buttonBar={<ElementButtonBar addElement={addElement} index={index} />}
             index={index}
           />
         );
