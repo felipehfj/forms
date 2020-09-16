@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import SectionType from '../../components/evaluation/SectionType';
 import { generate } from 'shortid';
 import LoggedUser from '../../components/general/LoggedUser';
@@ -6,7 +6,7 @@ import { EVALUATION } from '../../interfaces/elements';
 import { FaPalette, FaEllipsisH, FaSave } from 'react-icons/fa';
 import produce from 'immer';
 import Modal from 'react-modal';
-
+import api from '../../services/api';
 import './styles.css';
 
 
@@ -24,7 +24,7 @@ const modalThemeStyles = {
 };
 
 
-const Forms: React.FC = () => {
+const Forms: React.FC<{}> = () => {
   const [form, setForm] = useState<EVALUATION.Form>(
     {
       createdAt: new Date(),
@@ -38,28 +38,57 @@ const Forms: React.FC = () => {
         order: 0,
         ownerId: LoggedUser.userId,
         title: "",
-        type: 'section'
+        type: 'section',
+        nextStep: '',
+        prevStep: ''
       }],
       status: 'elaboration',
-      theme: 'lightblue',
+      theme: 'red',
       tipo: "survey",
-    });
+    }
+  );
 
-  const update = (e: EVALUATION.SectionElement) => {
+  useEffect(() => {
+    api.get('forms/aabbccddee')
+      .then(response => {
+        setForm(response.data.form[0])
+      })
+  }, [setForm])
+
+  const update = async (e: EVALUATION.SectionElement) => {
     setForm(form => produce(form, draft => {
-      let foundElement = draft.sections.filter(i => i.id === e.id);
-      if (foundElement) {
-        let sectionIdx = draft.sections.indexOf(foundElement[0]);
-        if (sectionIdx > -1) {
-          draft.sections[sectionIdx] = e;
+      if (draft) {
+        let foundElement = draft.sections.filter(i => i.id === e.id);
+        if (foundElement) {
+          let sectionIdx = draft.sections.indexOf(foundElement[0]);
+          if (sectionIdx > -1) {
+            draft.sections[sectionIdx] = e;
+          }
         }
       }
-    }));
+    })
+    );
   }
+
+  const updateRemote = () => {
+    api.put('forms/aabbccddee', form)
+      .then(response => {
+        console.log(response);
+      });
+  }
+
+  // useEffect(() => {
+  //   api.put('forms/aabbccddee', form)
+  //     .then(response => {
+  //       console.log(response);
+  //     });
+  // }, [form])
 
   const addSection = () => {
     setForm(form => produce(form, draft => {
-      draft.sections.push({ createdAt: new Date(), formElements: [], id: generate(), order: 0, ownerId: LoggedUser.userId, title: "", type: 'section' })
+      if (draft) {
+        draft.sections.push({ createdAt: new Date(), formElements: [], id: generate(), order: 0, ownerId: LoggedUser.userId, title: "", type: 'section', prevStep: '', nextStep: '' })
+      }
     }))
   }
 
@@ -75,125 +104,140 @@ const Forms: React.FC = () => {
 
   return (
     <Fragment>
-      <div className="configuration-container">
-        <div className="button-bar">
-          <button type='button' className="btn btn-icon" onClick={() => showModal()}><FaPalette /> Temas</button>
-          <button type='button' className="btn btn-icon"><FaSave /> Salvar</button>
-          <button type='button' className="btn btn-icon"><FaEllipsisH /></button>
-        </div>
-      </div>
+      {form ?
+        <div>
+          <div className="configuration-container">
+            <div className="button-bar">
+              <button type='button' className="btn btn-icon" onClick={() => showModal()}><FaPalette /> Temas</button>
+              <button type='button' className="btn btn-icon" onClick={() => { updateRemote() }}><FaSave /> Salvar</button>
+              <button type='button' className="btn btn-icon"><FaEllipsisH /></button>
+            </div>
+          </div>
 
-      <div style={{ backgroundColor: form.theme, width: '100%', height: 'calc(100vh - 40px)', overflowX: 'auto', paddingTop: 20 }} >
-        {form.sections.map((item, index) => {
-          return (<div key={item.id}>
+          <div style={{ backgroundColor: form ? form.theme : '', width: '100%', height: 'calc(100vh - 40px)', overflowX: 'auto', paddingTop: 20 }} >
 
-            <SectionType
-              sectionElement={item}
-              onAlterOrderHandler={(e: EVALUATION.SectionElement, type: "up" | "down") => {
-                let idx = form.sections.indexOf(e);
-                console.log(idx)
-                if (idx > -1) {
-                  if (type === 'up') {
-                    if (idx === 0) {
-                      return;
-                    } else {
-                      let anterior = form.sections[idx - 1];
-                      setForm(form => produce(form, draft => {
-                        draft.sections[idx - 1] = e;
-                        draft.sections[idx] = anterior;
-                      }))
-                    }
-                  }
+            {form && form.sections ? form.sections.map((item, index) => {
+              return (<div key={item.id}>
 
-                  if (type === 'down') {
-                    if (idx === form.sections.length - 1) {
-                      return;
-                    } else {
-                      let posterior = form.sections[idx + 1];
-                      setForm(form => produce(form, draft => {
-                        draft.sections[idx + 1] = e;
-                        draft.sections[idx] = posterior;
-                      }))
-                    }
-                  }
-                }
-
-              }}
-              onCopyHandler={(e: EVALUATION.SectionElement, index: number) => {
-                let ret = produce(e, draft => {
-                  let el = draft;
-                  let now = new Date();
-                  let owner = LoggedUser.userId;
-                  let sectionId = generate();
-
-                  el.createdAt = now;
-                  el.ownerId = owner;
-                  el.id = sectionId;
-
-                  el.formElements.forEach(item => {
-                    let itemId = generate();
-
-                    item.id = itemId;
-                    item.createdAt = now;
-                    item.ownerId = owner;
-                    item.options?.forEach(option => {
-                      option.createdAt = now;
-                      option.ownerId = owner;
-                      option.id = generate();
-                      if (item.type === 'select') {
-                        option.name = itemId;
+                <SectionType
+                  sectionElement={item}
+                  onAlterOrderHandler={(e: EVALUATION.SectionElement, type: "up" | "down") => {
+                    let idx = form.sections.indexOf(e);
+                    console.log(idx)
+                    if (idx > -1) {
+                      if (type === 'up') {
+                        if (idx === 0) {
+                          return;
+                        } else {
+                          let anterior = form.sections[idx - 1];
+                          setForm(form => produce(form, draft => {
+                            if (draft) {
+                              draft.sections[idx - 1] = e;
+                              draft.sections[idx] = anterior;
+                            }
+                          }))
+                        }
                       }
-                    })
-                    if (item.type === 'multiple') {
-                      item.response = item.options;
+
+                      if (type === 'down') {
+                        if (idx === form.sections.length - 1) {
+                          return;
+                        } else {
+                          let posterior = form.sections[idx + 1];
+                          setForm(form => produce(form, draft => {
+                            if (draft) {
+                              draft.sections[idx + 1] = e;
+                              draft.sections[idx] = posterior;
+                            }
+                          }))
+                        }
+                      }
                     }
-                  })
-                })
 
-                setForm(form => produce(form, draft => {
-                  draft.sections.splice(index + 1, 0, ret);
-                }))
-              }}
-              onRemoveHandler={(e: EVALUATION.SectionElement) => {
-                if (form.sections.length > 1) {
-                  setForm(form => produce(form, draft => {
-                    draft.sections = draft.sections.filter(i => i.id !== e.id)
-                  }))
-                }
-                else {
-                  alert('Deve haver pelo menos uma seção');
-                }
-              }}
-              onUpdateHandler={update}
-              onAddSection={addSection}
-              index={index}
-            />
+                  }}
+                  onCopyHandler={(e: EVALUATION.SectionElement, index: number) => {
+                    let ret = produce(e, draft => {
+                      let el = draft;
+                      let now = new Date();
+                      let owner = LoggedUser.userId;
+                      let sectionId = generate();
 
-          </div>)
-        })}
-      </div>
-      {/* <pre>
+                      el.createdAt = now;
+                      el.ownerId = owner;
+                      el.id = sectionId;
+
+                      el.formElements.forEach(item => {
+                        let itemId = generate();
+
+                        item.id = itemId;
+                        item.createdAt = now;
+                        item.ownerId = owner;
+                        item.options?.forEach(option => {
+                          option.createdAt = now;
+                          option.ownerId = owner;
+                          option.id = generate();
+                          if (item.type === 'select') {
+                            option.name = itemId;
+                          }
+                        })
+                        if (item.type === 'multiple') {
+                          item.response = item.options;
+                        }
+                      })
+                    })
+
+                    setForm(form => produce(form, draft => {
+                      if (draft) {
+                        draft.sections.splice(index + 1, 0, ret);
+                      }
+                    }))
+                  }}
+                  onRemoveHandler={(e: EVALUATION.SectionElement) => {
+                    if (form.sections.length > 1) {
+                      setForm(form => produce(form, draft => {
+                        if (draft) {
+                          draft.sections = draft.sections.filter(i => i.id !== e.id)
+                        }
+                      }))
+                    }
+                    else {
+                      alert('Deve haver pelo menos uma seção');
+                    }
+                  }}
+                  onUpdateHandler={update}
+                  onAddSection={addSection}
+                  index={index}
+                />
+
+              </div>)
+            }) : ''
+            }
+
+          </div>
+          {/* <pre>
         {JSON.stringify(form, null, 2)}
       </pre> */}
 
-      <Modal
-        isOpen={show}
-        //onAfterOpen={afterOpenModal}
-        ariaHideApp={false}
-        onRequestClose={closeModal}
-        style={modalThemeStyles}
-        contentLabel="Example Modal"
-      >
-        <div>
-          <button type="button" className="btn" style={{backgroundColor: 'red'}} onClick={() => {setForm(form => produce(form, draft=>{draft.theme='red'})) }}>Vermelho</button>
-          <button type="button" className="btn" style={{backgroundColor: 'blue'}}onClick={() => {setForm(form => produce(form, draft=>{draft.theme='blue'})) }}>Azul</button>
-          <button type="button" className="btn" style={{backgroundColor: 'green'}}onClick={() => {setForm(form => produce(form, draft=>{draft.theme='lightgreen'})) }}>Verde</button>
-          <button type="button" className="btn" style={{backgroundColor: 'rgba(255,0,0,0.5)'}}onClick={() => {setForm(form => produce(form, draft=>{draft.theme='rgba(255,0,0,0.2)'})) }}>Vermelho Claro</button>
-          <button type="button" className="btn" style={{backgroundColor: 'lightblue'}}onClick={() => {setForm(form => produce(form, draft=>{draft.theme='lightblue'})) }}>Azul claro</button>
-          <button type="button" className="btn" style={{backgroundColor: 'lightgreen'}}onClick={() => {setForm(form => produce(form, draft=>{draft.theme='lightgreen'})) }}>Verde Claro</button>
+          <Modal
+            isOpen={show}
+            //onAfterOpen={afterOpenModal}
+            ariaHideApp={false}
+            onRequestClose={closeModal}
+            style={modalThemeStyles}
+            contentLabel="Example Modal"
+          >
+            <div>
+              <button type="button" className="btn" style={{ backgroundColor: 'red' }} onClick={() => { setForm(form => produce(form, draft => { draft.theme = 'red' })) }}>Vermelho</button>
+              <button type="button" className="btn" style={{ backgroundColor: 'blue' }} onClick={() => { setForm(form => produce(form, draft => { draft.theme = 'blue' })) }}>Azul</button>
+              <button type="button" className="btn" style={{ backgroundColor: 'green' }} onClick={() => { setForm(form => produce(form, draft => { draft.theme = 'lightgreen' })) }}>Verde</button>
+              <button type="button" className="btn" style={{ backgroundColor: 'rgba(255,0,0,0.5)' }} onClick={() => { setForm(form => produce(form, draft => { draft.theme = 'rgba(255,0,0,0.2)' })) }}>Vermelho Claro</button>
+              <button type="button" className="btn" style={{ backgroundColor: 'lightblue' }} onClick={() => { setForm(form => produce(form, draft => { draft.theme = 'lightblue' })) }}>Azul claro</button>
+              <button type="button" className="btn" style={{ backgroundColor: 'lightgreen' }} onClick={() => { setForm(form => produce(form, draft => { draft.theme = 'lightgreen' })) }}>Verde Claro</button>
+            </div>
+            <button type="button" className="btn btn-secondary" style={{ width: "100%" }} onClick={closeModal}>ok</button>
+          </Modal>
         </div>
-        <button type="button" className="btn btn-secondary" style={{ width: "100%" }} onClick={closeModal}>ok</button>
-      </Modal>      
+        : <div>Carregando</div>}
     </Fragment>
   );
 }

@@ -2,6 +2,7 @@ import React, { Fragment, FC, useState, useEffect } from 'react';
 import { FaTrash, FaImage } from 'react-icons/fa';
 import Modal from 'react-modal';
 import ImageUploader from 'react-images-upload';
+import api from '../../../services/api';
 
 import './styles.css';
 import image from '../../../assets/midia/images/camera.svg';
@@ -28,27 +29,18 @@ const customStyles = {
 const ImageElement: FC<ImageElement> = (props: ImageElement) => {
     const [show, setShow] = useState(false);
     const [picture, setPicture] = useState<File[]>([]);
-    const [pictureUrl, setPictureUrl] = useState<string>("");    
-
-    useEffect(() => {
-        if (picture && picture.length > 0) {
-            let url = URL.createObjectURL(picture[0]);
-            setPictureUrl(url);
-        }
-    }, [picture])
+    const [pictureUrl, setPictureUrl] = useState<string>("");        
 
     useEffect(() => {
         if (props.imgSrc) {
             setPictureUrl(props.imgSrc);
         }
-    }, [props.imgSrc])
+    }, [props.imgSrc])   
 
     useEffect(() => {
-        if (pictureUrl) {
-            if (props.onChange)
+        if (props.onChange)
                 props.onChange(pictureUrl);
-        }
-    }, [pictureUrl])
+    }, [pictureUrl])   
 
     const showModal = () => {
         setShow(show => true)
@@ -56,18 +48,35 @@ const ImageElement: FC<ImageElement> = (props: ImageElement) => {
 
     const closeModal = () => {
         setShow(show => false)
+        sendImageToServer(picture[0])
     }
 
     const onDrop = (picture: File[]) => {        
-        setPicture(picture);
+        setPicture(picture);              
     }
 
-    const removeImage = () => {
-        setPictureUrl(url => "");
-        setPicture([]);
-        if (props.onChange)
-            props.onChange("");
+    const removeImage = async () => {
+        const path = pictureUrl.replace("http://localhost:3333/public/forms/images/", "");
+        api.delete(`/image/${path}`).then(res =>{
+            setPictureUrl(url => "");
+            //setPicture([]);
+            if (props.onChange)
+                props.onChange("");
+        })        
     }
+
+    const sendImageToServer = async (picture: File) =>{
+        let formData = new FormData();        
+        formData.append('image', picture);
+
+        const {data} = await api.post('/image', formData, {headers:{"Content-Type": `multipart/form-data;`}});
+
+        console.log(data)
+        const {path} = data.data;
+        console.log(path);
+        setPictureUrl(path);
+    }
+
     return (
         <Fragment>
             <div className="image-container">
