@@ -76,7 +76,7 @@ const EmailType: FC<EmailTypeProps> = ({ emailElement, onRemoveHandler, onAlterO
       <div className="portlet light" ref={node} style={isSelected ? { boxShadow: 'inset 0 0 1rem rgba(0,0,0,0.7)' } : {}}>
         <div className="portlet-title">
           <div className="actions">
-            <div className='.design-email-action-button-group' style={isSelected ? { display: 'inline-block' } : {}}>
+            <div className='design-email-action-button-group' style={isSelected ? { display: 'inline-block' } : {}}>
               <ControlElementButtonBar
                 onAlterOrderUp={() => alterOrder(element, "up")}
                 onAlterOrderDown={() => alterOrder(element, "down")}
@@ -88,7 +88,7 @@ const EmailType: FC<EmailTypeProps> = ({ emailElement, onRemoveHandler, onAlterO
         </div>
         <div className="portlet-body">
 
-          <div className=".design-email-title-area">
+          <div className="design-email-title-area">
             <div className="row">
               <div className="col-xs-12 col-sm-12 col-md-8 col-lg-8">
                 <div className="form-group">
@@ -136,7 +136,7 @@ const EmailType: FC<EmailTypeProps> = ({ emailElement, onRemoveHandler, onAlterO
             </div>
           </div>
 
-          <div className=".design-email-response-area">
+          <div className="design-email-response-area">
             <div className="row">
               <div className="col-xs-12" >
                 <div className="form-group">
@@ -161,9 +161,9 @@ const EmailType: FC<EmailTypeProps> = ({ emailElement, onRemoveHandler, onAlterO
 
           </div>
 
-          <div className='.design-email-area-separator' />
+          <div className='design-email-area-separator' />
 
-          <div className=".design-email-config-area">
+          <div className="design-email-config-area">
             <div className="row">
               <div className="col-md-8" style={{ marginTop: '2rem', marginBottom: '2rem', paddingBottom: 10 }}>
                 {isSelected ? buttonBar : ''}

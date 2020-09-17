@@ -3,7 +3,7 @@ interface IOption {
   name: string,
   value: string,
   ownerId: string,
-  createdAt: Date,  
+  createdAt: Date,
 }
 
 interface SelectOptions extends IOption {
@@ -16,7 +16,7 @@ interface MultipleOptions extends IOption {
 
 interface IBaseElement {
   id: string,
-  type: "text" | "paragraph" | "date" | "email" | "number" | "select" | "multiple" | "section",
+  type: "text" | "paragraph" | "date" | "email" | "number" | "select" | "multiple" | "section" | "classification",
   order: number,
   title: string,
   subtitle?: string,
@@ -28,7 +28,7 @@ interface IBaseElement {
 interface IElement extends IBaseElement {
   id: string,
   order: number,
-  type: "text" | "paragraph" | "date" | "email" | "number" | "select" | "multiple",
+  type: "text" | "paragraph" | "date" | "email" | "number" | "select" | "multiple" | "classification",
   title: string,
   subtitle?: string,
   imagePath?: string,
@@ -53,6 +53,15 @@ export declare namespace EVALUATION {
     response?: string,
   }
 
+  interface ClassificationElement extends IElement {
+    type: "classification",
+    response?: string,
+    icon: {
+      symbol: 'star' | 'number' | 'thumb' | 'heart' | 'smile',
+      quantity: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10,
+    }
+  }
+
   interface DateElement extends IElement {
     type: "date",
     response?: string,
@@ -67,7 +76,7 @@ export declare namespace EVALUATION {
     type: "select",
     options: Array<SelectOptions>,
     response?: SelectOptions,
-    navigation:string,
+    navigation: string,
   }
 
   interface MultipleElement extends IElement {
@@ -77,13 +86,13 @@ export declare namespace EVALUATION {
   }
 
   interface SectionElement extends IBaseElement {
-    formElements: Array<EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement>,
+    formElements: Array<EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement | EVALUATION.ClassificationElement>,
     prevStep: string,
-    nextStep: string,    
+    nextStep: string,
   }
 
   interface SelectOptions extends IOption {
-    navigation:string,
+    navigation: string,
   }
 
   interface MultipleOptions extends IOption {

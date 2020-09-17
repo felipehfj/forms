@@ -17,6 +17,7 @@ import Editable from '../../general/Editable';
 import api from '../../../services/api';
 import _ from 'lodash';
 import './styles.css';
+import ClassificationType from "../ClassificationType";
 
 interface SectionTypeProps {
   sectionElement: EVALUATION.SectionElement,
@@ -30,7 +31,7 @@ interface SectionTypeProps {
 
 const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler, onCopyHandler, onRemoveHandler, onUpdateHandler, onAddSection, index }) => {
   const [section, setSection] = useState<EVALUATION.SectionElement>(sectionElement);
-  const [elements, setElements] = useState<Array<EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement>>(sectionElement.formElements);
+  const [elements, setElements] = useState<Array<EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement | EVALUATION.ClassificationElement>>(sectionElement.formElements);
   const titleInputRef = useRef<HTMLTextAreaElement>(null);
   const subtitleInputRef = useRef<HTMLTextAreaElement>(null);
   const [isOpened, setIsOpened] = useState(true);
@@ -152,6 +153,46 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
             }
           }));
         break;
+        case "classification":
+          setElements(elements =>
+            produce(elements, draft => {
+              if (index >= 0) {
+                draft.splice(index + 1, 0, {
+                  id: generate(),
+                  order: orderCount,
+                  required: true,
+                  title: "",
+                  type: "classification",
+                  imagePath: "",
+                  response: "",
+                  subtitle: "",
+                  createdAt: new Date(),
+                  ownerId: LoggedUser.userId,
+                  icon:{
+                    quantity: 5,
+                    symbol: 'star'
+                  },
+                });
+              } else {
+                draft.push({
+                  id: generate(),
+                  order: orderCount,
+                  required: true,
+                  title: "",
+                  type: "classification",
+                  imagePath: "",
+                  response: "",
+                  subtitle: "",
+                  createdAt: new Date(),
+                  ownerId: LoggedUser.userId,
+                  icon:{
+                    quantity: 5,
+                    symbol: 'star'
+                  },
+                });
+              }
+            }));
+          break;
       case "paragraph":
         setElements(elements =>
           produce(elements, draft => {
@@ -236,7 +277,7 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
                 ],
                 createdAt: new Date(),
                 ownerId: LoggedUser.userId,
-                navigation:'nextSection',
+                navigation: 'nextSection',
               });
             } else {
               let id = generate()
@@ -255,7 +296,7 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
                 ],
                 createdAt: new Date(),
                 ownerId: LoggedUser.userId,
-                navigation:'nextSection',
+                navigation: 'nextSection',
               });
             }
           }));
@@ -309,7 +350,7 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
     }
   };
 
-  const handleRemove = async (element: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement) => {
+  const handleRemove = async (element: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement | EVALUATION.ClassificationElement) => {
     if (element.imagePath) {
       try {
         await api.delete(`/image/${element.imagePath}`);
@@ -323,7 +364,7 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
     );
   };
 
-  function handleUpdate(e: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement) {
+  function handleUpdate(e: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement | EVALUATION.ClassificationElement) {
     let atual = elements.find(c => c.id === e.id);
     if (atual) {
       let idxAtual = elements.indexOf(atual);
@@ -333,7 +374,7 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
     }
   }
 
-  function handleAlterOrder(e: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement, type: "up" | "down") {
+  function handleAlterOrder(e: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement | EVALUATION.ClassificationElement, type: "up" | "down") {
     let idx = e.order;
     if (idx > -1) {
       if (type === 'up') {
@@ -362,7 +403,7 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
     }
   }
 
-  async function handleCopy(e: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement) {
+  async function handleCopy(e: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement | EVALUATION.ClassificationElement) {
     const idx = e.order;
     let newPathImage = '';
 
@@ -380,7 +421,7 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
       draft.id = genId;
       draft.ownerId = LoggedUser.userId;
       draft.createdAt = new Date();
-      if(draft.imagePath&&newPathImage){
+      if (draft.imagePath && newPathImage) {
         draft.imagePath = newPathImage;
       }
       if (draft.options) {
@@ -400,7 +441,7 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
     }))
   }
 
-  function selectElement(p: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement, index: number) {
+  function selectElement(p: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement | EVALUATION.ClassificationElement, index: number) {
     switch (p.type) {
       case 'text':
         return (
@@ -486,6 +527,18 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
             index={index}
           />
         );
+      case 'classification':
+        return (
+          <ClassificationType
+            classificationElement={p}
+            onRemoveHandler={handleRemove}
+            onUpdateHandler={handleUpdate}
+            onAlterOrderHandler={handleAlterOrder}
+            onCopyHandler={handleCopy}
+            buttonBar={<ElementButtonBar addElement={addElement} index={index} />}
+            index={index}
+          />
+        );
       default:
         return null;
     }
@@ -497,7 +550,7 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
         <div className="portlet light grey">
           <div className="portlet-title">
             <div className="caption">
-              Seção {index + 1} {section.title ? _.truncate(` | ${section.title}`, {length:50, separator: ' ', omission: '...'}) : ''}
+              Seção {index + 1} {section.title ? _.truncate(` | ${section.title}`, { length: 50, separator: ' ', omission: '...' }) : ''}
             </div>
             <div className="tools">
 
