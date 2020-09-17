@@ -1,7 +1,8 @@
-import React, { FC, Fragment, useState, useEffect } from 'react';
+import React, { FC, Fragment, useState, useEffect, useContext } from 'react';
 import { FaTrash, FaArrowUp, FaArrowDown, FaCopy, FaPlus } from 'react-icons/fa';
 import { EVALUATION } from '../../../interfaces/elements';
-import produce from 'immer';
+import GotoSelection from '../../general/GotoSelection';
+import FormContext from '../../../views/Forms/FormContext';
 
 import './styles.css';
 
@@ -14,10 +15,11 @@ interface SelectOptionElementProps {
   onSelectHandler: Function,
   onAddElement?: Function,
   designMode?: boolean,
-  index: number
+  index: number,  
 }
 
-const SelectOptionElement: FC<SelectOptionElementProps> = ({ optionElement, onAlterOrderHandler, onCopyHandler, onRemoveHandler, onUpdateHandler, onSelectHandler, onAddElement, designMode=true, index }) => {
+const SelectOptionElement: FC<SelectOptionElementProps> = ({children, optionElement, onAlterOrderHandler, onCopyHandler, onRemoveHandler, onUpdateHandler, onSelectHandler, onAddElement, designMode = true, index }) => {
+  const { form, sectionsSummary } = useContext(FormContext);
   const [option, setOption] = useState<EVALUATION.SelectOptions>(optionElement);
 
   useEffect(() => { setOption(optionElement => optionElement) }, [optionElement]);
@@ -74,7 +76,19 @@ const SelectOptionElement: FC<SelectOptionElementProps> = ({ optionElement, onAl
               const { value } = e.target;
               setOption({ ...option, value: value });
             }}
-          />
+          />          
+        </div>
+        <div className='question-choice-option-goto inline-display'>
+        <GotoSelection
+            name={"navigation"}
+            value={option.navigation}
+            className="form-control"
+            setSelection={(e: any) => {
+              const {name, value} = e;
+              console.log(name, value)
+              setOption({...option, [name]: value})}
+            }
+            sections={sectionsSummary ? sectionsSummary : []} />            
         </div>
 
         <div className="question-btn-container">

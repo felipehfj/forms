@@ -1,4 +1,4 @@
-import React, { Fragment, FC, useState, useEffect, useRef } from 'react';
+import React, { Fragment, FC, useState, useEffect, useRef, useContext } from 'react';
 import { produce } from "immer";
 import { generate } from 'shortid';
 import SliderSwitch from '../../general/SliderSwitch';
@@ -6,8 +6,10 @@ import ControlElementButtonBar from '../../general/ControlElementButtonBar';
 import ImageElement from '../../general/ImageElement';
 import SelectOptionElement from '../../general/SelectOptionElement';
 import LoggedUser from '../../general/LoggedUser';
+
 import { EVALUATION } from '../../../interfaces/elements';
 import './styles.css';
+
 
 interface SelectTypeProps {
   selectElement: EVALUATION.SelectElement,
@@ -20,6 +22,8 @@ interface SelectTypeProps {
 }
 
 const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlterOrderHandler, onCopyHandler, onUpdateHandler, buttonBar, index }: SelectTypeProps) => {
+
+
   const [isUpdated, setIsUpdated] = useState<boolean>(false);
   const [isSelected, setSelected] = useState<boolean>(false);
   const node = useRef<HTMLDivElement>(null);
@@ -78,6 +82,8 @@ const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlt
     setElement({ ...element, [name]: value });
     setIsUpdated(true);
   }
+
+
 
   return (
     <Fragment>
@@ -225,12 +231,12 @@ const SelectType: FC<SelectTypeProps> = ({ selectElement, onRemoveHandler, onAlt
                           onAddElement={(index: number) => {
                             if (index >= 0) {
                               let options = produce(element.options, draft => {
-                                draft.splice(index + 1, 0, { id: generate(), name: element.id, value: "", ownerId: LoggedUser.userId, createdAt: new Date() })
+                                draft.splice(index + 1, 0, { id: generate(), name: element.id, value: "", ownerId: LoggedUser.userId, createdAt: new Date(), navigation: 'nextSection' })
                               })
                               handleElementChange('options', options);
                             } else {
                               let options = produce(element.options, draft => {
-                                draft.push({ id: generate(), name: element.id, value: "", ownerId: LoggedUser.userId, createdAt: new Date() })
+                                draft.push({ id: generate(), name: element.id, value: "", ownerId: LoggedUser.userId, createdAt: new Date(), navigation: 'nextSection' })
                               })
                               handleElementChange('options', options);
                             }

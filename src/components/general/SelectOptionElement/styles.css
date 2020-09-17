@@ -10,13 +10,13 @@
 
 .question-choice-container .question-choice-label{
     position: relative;
-    padding-left: 34px;
+    padding-left: 1px;
 }
 
 .question-choice-container .question-choice-icon-group{
     display: inline-block;
     vertical-align: middle;
-    margin: 10px 10px;
+    margin: 0 10px;
 }
 
 .question-choice-container .question-choice-icon{
@@ -27,7 +27,12 @@
 }
 
 .question-choice-container .question-choice-option-textbox{    
-    width: 50%;    
+    width: 40%;    
+    vertical-align: middle;
+}
+
+.question-choice-container .question-choice-option-goto{    
+    width: 30%;    
     vertical-align: middle;
 }
 

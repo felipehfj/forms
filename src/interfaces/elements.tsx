@@ -67,6 +67,7 @@ export declare namespace EVALUATION {
     type: "select",
     options: Array<SelectOptions>,
     response?: SelectOptions,
+    navigation:string,
   }
 
   interface MultipleElement extends IElement {
@@ -82,6 +83,7 @@ export declare namespace EVALUATION {
   }
 
   interface SelectOptions extends IOption {
+    navigation:string,
   }
 
   interface MultipleOptions extends IOption {

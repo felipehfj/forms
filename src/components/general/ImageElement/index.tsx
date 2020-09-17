@@ -7,12 +7,13 @@ import api from '../../../services/api';
 import './styles.css';
 import image from '../../../assets/midia/images/camera.svg';
 
-//import image from '../../../assets/midia/images/PeHeitor.jpg';
+
 interface ImageElement {
     imgSrc?: string,
     onChange?: Function
 }
 
+const imagePath = 'http://localhost:3333/public/forms/images';
 const customStyles = {
     content: {
         top: '50%',
@@ -29,18 +30,18 @@ const customStyles = {
 const ImageElement: FC<ImageElement> = (props: ImageElement) => {
     const [show, setShow] = useState(false);
     const [picture, setPicture] = useState<File[]>([]);
-    const [pictureUrl, setPictureUrl] = useState<string>("");        
+    const [pictureUrl, setPictureUrl] = useState<string>("");
 
     useEffect(() => {
         if (props.imgSrc) {
             setPictureUrl(props.imgSrc);
         }
-    }, [props.imgSrc])   
+    }, [props.imgSrc])
 
     useEffect(() => {
         if (props.onChange)
-                props.onChange(pictureUrl);
-    }, [pictureUrl])   
+            props.onChange(pictureUrl);
+    }, [pictureUrl])
 
     const showModal = () => {
         setShow(show => true)
@@ -51,36 +52,35 @@ const ImageElement: FC<ImageElement> = (props: ImageElement) => {
         sendImageToServer(picture[0])
     }
 
-    const onDrop = (picture: File[]) => {        
-        setPicture(picture);              
+    const onDrop = (picture: File[]) => {
+        setPicture(picture);
     }
 
-    const removeImage = async () => {
-        const path = pictureUrl.replace("http://localhost:3333/public/forms/images/", "");
-        api.delete(`/image/${path}`).then(res =>{
+    const removeImage = async () => {        
+        api.delete(`/image/${pictureUrl}`).then(res => {
             setPictureUrl(url => "");
-            //setPicture([]);
             if (props.onChange)
                 props.onChange("");
-        })        
+        })
     }
 
-    const sendImageToServer = async (picture: File) =>{
-        let formData = new FormData();        
-        formData.append('image', picture);
+    const sendImageToServer = async (picture: File) => {
+        if (picture) {
+            let formData = new FormData();
+            formData.append('image', picture);
 
-        const {data} = await api.post('/image', formData, {headers:{"Content-Type": `multipart/form-data;`}});
-
-        console.log(data)
-        const {path} = data.data;
-        console.log(path);
-        setPictureUrl(path);
+            const { data } = await api.post('/image', formData, { headers: { "Content-Type": `multipart/form-data;` } });
+            
+            const { name } = data.data;
+            console.log(name);
+            setPictureUrl(name);
+        }
     }
 
     return (
         <Fragment>
             <div className="image-container">
-                <img src={pictureUrl ? pictureUrl : image} alt="" style={pictureUrl ? {}:{width:200, height: 200}} />
+                <img src={pictureUrl ? `${imagePath}/${pictureUrl}` : image} alt="" style={pictureUrl ? {} : { width: 200, height: 200 }} />
                 <div className="btn-container">
                     <button className="btn" onClick={() => removeImage()}><FaTrash /></button>
                     <button className="btn" onClick={() => showModal()}><FaImage /></button>
@@ -110,7 +110,7 @@ const ImageElement: FC<ImageElement> = (props: ImageElement) => {
                     label="Tamanho máximo permitido: 5MB."
                     fileContainerStyle={{ maxWidth: '300px', maxHeight: '300px' }}
                 />
-                <button type="button" className="btn btn-secondary" style={{width:"100%"}} onClick={closeModal}>ok</button>                
+                <button type="button" className="btn btn-secondary" style={{ width: "100%" }} onClick={closeModal}>ok</button>
             </Modal>
         </Fragment>
     );

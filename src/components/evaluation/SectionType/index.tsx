@@ -14,7 +14,8 @@ import ElementButtonBar from "../../../components/general/ElementButtonBar";
 import SectionButtonBar from "../../general/SectionButtonBar";
 import { Collapse } from 'react-collapse';
 import Editable from '../../general/Editable';
-import StringUtils from '../../../utils/StringUtils';
+import api from '../../../services/api';
+import _ from 'lodash';
 import './styles.css';
 
 interface SectionTypeProps {
@@ -230,11 +231,12 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
                 response: undefined,
                 subtitle: "",
                 options: [
-                  { id: generate(), name: id, value: '', ownerId: LoggedUser.userId, createdAt: new Date() },
-                  { id: generate(), name: id, value: "Outros", ownerId: LoggedUser.userId, createdAt: new Date() },
+                  { id: generate(), name: id, value: '', ownerId: LoggedUser.userId, createdAt: new Date(), navigation: 'nextSection' },
+                  { id: generate(), name: id, value: "Outros", ownerId: LoggedUser.userId, createdAt: new Date(), navigation: 'nextSection' },
                 ],
                 createdAt: new Date(),
                 ownerId: LoggedUser.userId,
+                navigation:'nextSection',
               });
             } else {
               let id = generate()
@@ -248,11 +250,12 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
                 response: undefined,
                 subtitle: "",
                 options: [
-                  { id: generate(), name: id, value: '', ownerId: LoggedUser.userId, createdAt: new Date() },
-                  { id: generate(), name: id, value: "Outros", ownerId: LoggedUser.userId, createdAt: new Date() },
+                  { id: generate(), name: id, value: '', ownerId: LoggedUser.userId, createdAt: new Date(), navigation: 'nextSection' },
+                  { id: generate(), name: id, value: "Outros", ownerId: LoggedUser.userId, createdAt: new Date(), navigation: 'nextSection' },
                 ],
                 createdAt: new Date(),
                 ownerId: LoggedUser.userId,
+                navigation:'nextSection',
               });
             }
           }));
@@ -306,7 +309,15 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
     }
   };
 
-  const handleRemove = (element: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement) => {
+  const handleRemove = async (element: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement) => {
+    if (element.imagePath) {
+      try {
+        await api.delete(`/image/${element.imagePath}`);
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
     setElements(currentElement =>
       currentElement.filter(x => x.id !== element.id)
     );
@@ -351,13 +362,27 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
     }
   }
 
-  function handleCopy(e: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement) {
+  async function handleCopy(e: EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement) {
     const idx = e.order;
+    let newPathImage = '';
+
+    if (e.imagePath) {
+      try {
+        const { data } = await api.post('/image/copy', { image: e.imagePath });
+        const { name } = data.data;
+        newPathImage = name
+      } catch (error) {
+
+      }
+    }
     let newElement = produce(e, draft => {
       let genId = generate();
       draft.id = genId;
       draft.ownerId = LoggedUser.userId;
       draft.createdAt = new Date();
+      if(draft.imagePath&&newPathImage){
+        draft.imagePath = newPathImage;
+      }
       if (draft.options) {
         if (draft.type === 'select') {
           let optSelect: Array<EVALUATION.SelectOptions> = [];
@@ -472,7 +497,7 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
         <div className="portlet light grey">
           <div className="portlet-title">
             <div className="caption">
-              Seção {index + 1} {section.title ? StringUtils.truncate(` | ${section.title}`, 50) : ''}
+              Seção {index + 1} {section.title ? _.truncate(` | ${section.title}`, {length:50, separator: ' ', omission: '...'}) : ''}
             </div>
             <div className="tools">
 

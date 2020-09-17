@@ -8,6 +8,7 @@ import produce from 'immer';
 import Modal from 'react-modal';
 import api from '../../services/api';
 import './styles.css';
+import { FormProvider } from '../Forms/FormContext';
 
 
 const modalThemeStyles = {
@@ -23,37 +24,23 @@ const modalThemeStyles = {
   }
 };
 
-
 const Forms: React.FC<{}> = () => {
-  const [form, setForm] = useState<EVALUATION.Form>(
-    {
-      createdAt: new Date(),
-      id: generate(),
-      isPublic: false,
-      ownerId: LoggedUser.userId,
-      sections: [{
-        createdAt: new Date(),
-        formElements: [],
-        id: generate(),
-        order: 0,
-        ownerId: LoggedUser.userId,
-        title: "",
-        type: 'section',
-        nextStep: '',
-        prevStep: ''
-      }],
-      status: 'elaboration',
-      theme: 'red',
-      tipo: "survey",
-    }
-  );
-
+  const [form, setForm] = useState<EVALUATION.Form>();
+  const [sectionsSummary, setSectionsSummary] = useState<Array<{ id: string, title: string }>>([])
   useEffect(() => {
     api.get('forms/aabbccddee')
       .then(response => {
         setForm(response.data.form[0])
       })
   }, [setForm])
+
+  useEffect(() => {
+    if (form) {
+      setSectionsSummary(sectionsSummary => produce(sectionsSummary, draft => {
+        return getSectionSummary(form)
+      }));
+    }
+  }, [form])
 
   const update = async (e: EVALUATION.SectionElement) => {
     setForm(form => produce(form, draft => {
@@ -77,13 +64,6 @@ const Forms: React.FC<{}> = () => {
       });
   }
 
-  // useEffect(() => {
-  //   api.put('forms/aabbccddee', form)
-  //     .then(response => {
-  //       console.log(response);
-  //     });
-  // }, [form])
-
   const addSection = () => {
     setForm(form => produce(form, draft => {
       if (draft) {
@@ -101,141 +81,161 @@ const Forms: React.FC<{}> = () => {
     setShow(show => false)
   }
 
+  const getSectionSummary = (form: EVALUATION.Form) => {
+    if (form) {
+      const summary = form.sections.map(item => {
+        const { id, title } = item;
+        return { id, title };
+      });
+
+      return summary;
+    }
+  }
 
   return (
     <Fragment>
       {form ?
         <div>
-          <div className="configuration-container">
-            <div className="button-bar">
-              <button type='button' className="btn btn-icon" onClick={() => showModal()}><FaPalette /> Temas</button>
-              <button type='button' className="btn btn-icon" onClick={() => { updateRemote() }}><FaSave /> Salvar</button>
-              <button type='button' className="btn btn-icon"><FaEllipsisH /></button>
+          <FormProvider value={{ form, sectionsSummary }}>
+            <div className="configuration-container">
+              <div className="button-bar">
+                <button type='button' className="btn btn-icon" onClick={() => showModal()}><FaPalette /> Temas</button>
+                <button type='button' className="btn btn-icon" onClick={() => { updateRemote() }}><FaSave /> Salvar</button>
+                <button type='button' className="btn btn-icon"><FaEllipsisH /></button>
+              </div>
             </div>
-          </div>
 
-          <div style={{ backgroundColor: form ? form.theme : '', width: '100%', height: 'calc(100vh - 40px)', overflowX: 'auto', paddingTop: 20 }} >
+            <div style={{ backgroundColor: form ? form.theme : '', width: '100%', height: 'calc(100vh - 40px)', overflowX: 'auto', paddingTop: 20 }} >
 
-            {form && form.sections ? form.sections.map((item, index) => {
-              return (<div key={item.id}>
+              {form && form.sections ? form.sections.map((item, index) => {
+                return (<div key={item.id}>
 
-                <SectionType
-                  sectionElement={item}
-                  onAlterOrderHandler={(e: EVALUATION.SectionElement, type: "up" | "down") => {
-                    let idx = form.sections.indexOf(e);
-                    console.log(idx)
-                    if (idx > -1) {
-                      if (type === 'up') {
-                        if (idx === 0) {
-                          return;
-                        } else {
-                          let anterior = form.sections[idx - 1];
-                          setForm(form => produce(form, draft => {
-                            if (draft) {
-                              draft.sections[idx - 1] = e;
-                              draft.sections[idx] = anterior;
-                            }
-                          }))
+                  <SectionType
+                    sectionElement={item}
+                    onAlterOrderHandler={(e: EVALUATION.SectionElement, type: "up" | "down") => {
+                      let idx = form.sections.indexOf(e);
+                      console.log(idx)
+                      if (idx > -1) {
+                        if (type === 'up') {
+                          if (idx === 0) {
+                            return;
+                          } else {
+                            let anterior = form.sections[idx - 1];
+                            setForm(form => produce(form, draft => {
+                              if (draft) {
+                                draft.sections[idx - 1] = e;
+                                draft.sections[idx] = anterior;
+                              }
+                            }))
+                          }
+                        }
+
+                        if (type === 'down') {
+                          if (idx === form.sections.length - 1) {
+                            return;
+                          } else {
+                            let posterior = form.sections[idx + 1];
+                            setForm(form => produce(form, draft => {
+                              if (draft) {
+                                draft.sections[idx + 1] = e;
+                                draft.sections[idx] = posterior;
+                              }
+                            }))
+                          }
                         }
                       }
 
-                      if (type === 'down') {
-                        if (idx === form.sections.length - 1) {
-                          return;
-                        } else {
-                          let posterior = form.sections[idx + 1];
-                          setForm(form => produce(form, draft => {
-                            if (draft) {
-                              draft.sections[idx + 1] = e;
-                              draft.sections[idx] = posterior;
+                    }}
+                    onCopyHandler={async (e: EVALUATION.SectionElement, index: number) => {
+                      let ret = produce(e, draft => {
+                        let el = draft;
+                        let now = new Date();
+                        let owner = LoggedUser.userId;
+                        let sectionId = generate();
+
+                        el.createdAt = now;
+                        el.ownerId = owner;
+                        el.id = sectionId;
+
+                        el.formElements.forEach(async item => {
+                          let itemId = generate();
+                          item.imagePath = ''
+                          item.id = itemId;
+                          item.createdAt = now;
+                          item.ownerId = owner;
+                          item.options?.forEach(option => {
+                            option.createdAt = now;
+                            option.ownerId = owner;
+                            option.id = generate();
+                            if (item.type === 'select') {
+                              option.name = itemId;
                             }
-                          }))
-                        }
-                      }
-                    }
-
-                  }}
-                  onCopyHandler={(e: EVALUATION.SectionElement, index: number) => {
-                    let ret = produce(e, draft => {
-                      let el = draft;
-                      let now = new Date();
-                      let owner = LoggedUser.userId;
-                      let sectionId = generate();
-
-                      el.createdAt = now;
-                      el.ownerId = owner;
-                      el.id = sectionId;
-
-                      el.formElements.forEach(item => {
-                        let itemId = generate();
-
-                        item.id = itemId;
-                        item.createdAt = now;
-                        item.ownerId = owner;
-                        item.options?.forEach(option => {
-                          option.createdAt = now;
-                          option.ownerId = owner;
-                          option.id = generate();
-                          if (item.type === 'select') {
-                            option.name = itemId;
+                          })
+                          if (item.type === 'multiple') {
+                            item.response = item.options;
                           }
                         })
-                        if (item.type === 'multiple') {
-                          item.response = item.options;
-                        }
                       })
-                    })
-
-                    setForm(form => produce(form, draft => {
-                      if (draft) {
-                        draft.sections.splice(index + 1, 0, ret);
-                      }
-                    }))
-                  }}
-                  onRemoveHandler={(e: EVALUATION.SectionElement) => {
-                    if (form.sections.length > 1) {
                       setForm(form => produce(form, draft => {
                         if (draft) {
-                          draft.sections = draft.sections.filter(i => i.id !== e.id)
+                          draft.sections.splice(index + 1, 0, ret);
                         }
                       }))
-                    }
-                    else {
-                      alert('Deve haver pelo menos uma seção');
-                    }
-                  }}
-                  onUpdateHandler={update}
-                  onAddSection={addSection}
-                  index={index}
-                />
+                    }}
+                    onRemoveHandler={(e: EVALUATION.SectionElement) => {
+                      if (form.sections.length > 1) {
+                        e.formElements.forEach(item => {
+                          if (item.imagePath) {
+                            try {
+                              api.delete(`/image/${item.imagePath}`);
+                            } catch (error) {
+                              console.log(error)
+                            }
+                          }
+                        })
+                        setForm(form => produce(form, draft => {
+                          if (draft) {
+                            draft.sections = draft.sections.filter(i => i.id !== e.id)
+                          }
+                        }))
+                      }
+                      else {
+                        alert('Deve haver pelo menos uma seção');
+                      }
+                    }}
+                    onUpdateHandler={update}
+                    onAddSection={addSection}
+                    index={index}
+                  />
 
-              </div>)
-            }) : ''
-            }
+                </div>)
+              }) : ''
+              }
 
-          </div>
-          {/* <pre>
+            </div>
+            {/* <pre>
         {JSON.stringify(form, null, 2)}
       </pre> */}
 
-          <Modal
-            isOpen={show}
-            //onAfterOpen={afterOpenModal}
-            ariaHideApp={false}
-            onRequestClose={closeModal}
-            style={modalThemeStyles}
-            contentLabel="Example Modal"
-          >
-            <div>
-              <button type="button" className="btn" style={{ backgroundColor: 'red' }} onClick={() => { setForm(form => produce(form, draft => { draft.theme = 'red' })) }}>Vermelho</button>
-              <button type="button" className="btn" style={{ backgroundColor: 'blue' }} onClick={() => { setForm(form => produce(form, draft => { draft.theme = 'blue' })) }}>Azul</button>
-              <button type="button" className="btn" style={{ backgroundColor: 'green' }} onClick={() => { setForm(form => produce(form, draft => { draft.theme = 'lightgreen' })) }}>Verde</button>
-              <button type="button" className="btn" style={{ backgroundColor: 'rgba(255,0,0,0.5)' }} onClick={() => { setForm(form => produce(form, draft => { draft.theme = 'rgba(255,0,0,0.2)' })) }}>Vermelho Claro</button>
-              <button type="button" className="btn" style={{ backgroundColor: 'lightblue' }} onClick={() => { setForm(form => produce(form, draft => { draft.theme = 'lightblue' })) }}>Azul claro</button>
-              <button type="button" className="btn" style={{ backgroundColor: 'lightgreen' }} onClick={() => { setForm(form => produce(form, draft => { draft.theme = 'lightgreen' })) }}>Verde Claro</button>
-            </div>
-            <button type="button" className="btn btn-secondary" style={{ width: "100%" }} onClick={closeModal}>ok</button>
-          </Modal>
+            <Modal
+              isOpen={show}
+              //onAfterOpen={afterOpenModal}
+              ariaHideApp={false}
+              onRequestClose={closeModal}
+              style={modalThemeStyles}
+              contentLabel="Example Modal"
+            >
+              <div>
+                <button type="button" className="btn" style={{ backgroundColor: 'red' }} onClick={() => { setForm(form => produce(form, draft => { if (draft) draft.theme = 'red' })) }}>Vermelho</button>
+                <button type="button" className="btn" style={{ backgroundColor: 'blue' }} onClick={() => { setForm(form => produce(form, draft => { if (draft) draft.theme = 'blue' })) }}>Azul</button>
+                <button type="button" className="btn" style={{ backgroundColor: 'green' }} onClick={() => { setForm(form => produce(form, draft => { if (draft) draft.theme = 'lightgreen' })) }}>Verde</button>
+                <button type="button" className="btn" style={{ backgroundColor: 'rgba(255,0,0,0.5)' }} onClick={() => { setForm(form => produce(form, draft => { if (draft) draft.theme = 'rgba(255,0,0,0.2)' })) }}>Vermelho Claro</button>
+                <button type="button" className="btn" style={{ backgroundColor: 'lightblue' }} onClick={() => { setForm(form => produce(form, draft => { if (draft) draft.theme = 'lightblue' })) }}>Azul claro</button>
+                <button type="button" className="btn" style={{ backgroundColor: 'lightgreen' }} onClick={() => { setForm(form => produce(form, draft => { if (draft) draft.theme = 'lightgreen' })) }}>Verde Claro</button>
+              </div>
+              <button type="button" className="btn btn-secondary" style={{ width: "100%" }} onClick={closeModal}>ok</button>
+            </Modal>
+          </FormProvider>
         </div>
         : <div>Carregando</div>}
     </Fragment>
