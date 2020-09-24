@@ -11,7 +11,7 @@ interface ClassificationIconProps {
     onClick?: Function,
     designMode: boolean,
 }
-const ClassificationIcon: React.FC<ClassificationIconProps> = ({ symbol, quantity, iconSize = 30, initalState, onClick, designMode = true }) => {
+const ClassificationIcon: React.FC<ClassificationIconProps> = ({ symbol, quantity, iconSize = 30, initalState, onClick, designMode = true }) => {    
     function range(start: number, end: number) {
         let list = [];
         for (let index = start; index <= end; index++) {
@@ -29,7 +29,7 @@ const ClassificationIcon: React.FC<ClassificationIconProps> = ({ symbol, quantit
             case 'heart':
                 return <FaRegHeart size={iconSize} />;
             case 'number':
-                return <span className="classification-icon-text">-</span>;
+                return <span className="classification-icon-text">_</span>;
             case 'smile':
                 return <FaRegMeh size={iconSize} />;
             default:

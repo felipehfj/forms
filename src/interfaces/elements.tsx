@@ -87,8 +87,7 @@ export declare namespace EVALUATION {
 
   interface SectionElement extends IBaseElement {
     formElements: Array<EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement | EVALUATION.ClassificationElement>,
-    prevStep: string,
-    nextStep: string,
+    navigation: string,    
   }
 
   interface SelectOptions extends IOption {

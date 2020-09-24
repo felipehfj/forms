@@ -1,4 +1,4 @@
-import React, { FC, Fragment, useState, useEffect, useRef } from "react";
+import React, { FC, Fragment, useState, useEffect, useRef, useContext } from "react";
 import { generate } from "shortid";
 import { produce } from "immer";
 import { EVALUATION } from '../../../interfaces/elements';
@@ -18,6 +18,8 @@ import api from '../../../services/api';
 import _ from 'lodash';
 import './styles.css';
 import ClassificationType from "../ClassificationType";
+import GotoSelection from "../../general/GotoSelection";
+import FormContext from '../../../views/Forms/FormContext';
 
 interface SectionTypeProps {
   sectionElement: EVALUATION.SectionElement,
@@ -30,6 +32,8 @@ interface SectionTypeProps {
 }
 
 const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler, onCopyHandler, onRemoveHandler, onUpdateHandler, onAddSection, index }) => {
+  const { form, sectionsSummary } = useContext(FormContext);
+
   const [section, setSection] = useState<EVALUATION.SectionElement>(sectionElement);
   const [elements, setElements] = useState<Array<EVALUATION.TextElement | EVALUATION.ParagraphElement | EVALUATION.NumberElement | EVALUATION.DateElement | EVALUATION.EmailElement | EVALUATION.SelectElement | EVALUATION.MultipleElement | EVALUATION.ClassificationElement>>(sectionElement.formElements);
   const titleInputRef = useRef<HTMLTextAreaElement>(null);
@@ -153,46 +157,46 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
             }
           }));
         break;
-        case "classification":
-          setElements(elements =>
-            produce(elements, draft => {
-              if (index >= 0) {
-                draft.splice(index + 1, 0, {
-                  id: generate(),
-                  order: orderCount,
-                  required: true,
-                  title: "",
-                  type: "classification",
-                  imagePath: "",
-                  response: "",
-                  subtitle: "",
-                  createdAt: new Date(),
-                  ownerId: LoggedUser.userId,
-                  icon:{
-                    quantity: 5,
-                    symbol: 'star'
-                  },
-                });
-              } else {
-                draft.push({
-                  id: generate(),
-                  order: orderCount,
-                  required: true,
-                  title: "",
-                  type: "classification",
-                  imagePath: "",
-                  response: "",
-                  subtitle: "",
-                  createdAt: new Date(),
-                  ownerId: LoggedUser.userId,
-                  icon:{
-                    quantity: 5,
-                    symbol: 'star'
-                  },
-                });
-              }
-            }));
-          break;
+      case "classification":
+        setElements(elements =>
+          produce(elements, draft => {
+            if (index >= 0) {
+              draft.splice(index + 1, 0, {
+                id: generate(),
+                order: orderCount,
+                required: true,
+                title: "",
+                type: "classification",
+                imagePath: "",
+                response: "",
+                subtitle: "",
+                createdAt: new Date(),
+                ownerId: LoggedUser.userId,
+                icon: {
+                  quantity: 5,
+                  symbol: 'star'
+                },
+              });
+            } else {
+              draft.push({
+                id: generate(),
+                order: orderCount,
+                required: true,
+                title: "",
+                type: "classification",
+                imagePath: "",
+                response: "",
+                subtitle: "",
+                createdAt: new Date(),
+                ownerId: LoggedUser.userId,
+                icon: {
+                  quantity: 5,
+                  symbol: 'star'
+                },
+              });
+            }
+          }));
+        break;
       case "paragraph":
         setElements(elements =>
           produce(elements, draft => {
@@ -630,7 +634,24 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
                           {selectElement(p, index)}
                           <div className="controller-container">
                             <div className="btn-container">
-                              <ElementButtonBar addElement={addElement} index={index} />
+                              <div className="row">
+                                <div className="col-md-6">
+                                  <GotoSelection
+                                    name={"navigation"}
+                                    value={section.navigation}
+                                    className="form-control"
+                                    setSelection={(e: any) => {
+                                      const { name, value } = e;
+                                      setSection({ ...section, [name]: value })
+                                    }}
+                                    sections={sectionsSummary ? sectionsSummary : []}
+                                  />
+                                </div>
+                                <div className="col-md-6">
+                                  <ElementButtonBar addElement={addElement} index={index} />
+                                </div>
+                              </div>
+
                             </div>
                           </div>
                         </div>
@@ -639,7 +660,27 @@ const SectionType: FC<SectionTypeProps> = ({ sectionElement, onAlterOrderHandler
                     :
                     <div className="controller-container">
                       <div className="btn-container">
-                        <ElementButtonBar addElement={addElement} index={index} />
+                        <div className="row">
+                          <div className="col-md-6">
+                            <GotoSelection
+                              name={"navigation"}
+                              value={section.navigation}
+                              className="form-control"
+                              setSelection={(e: any) => {
+                                const { name, value } = e;
+                                setSection({ ...section, [name]: value })
+                              }}
+                              sections={sectionsSummary ? sectionsSummary : []}
+                            />
+                          </div>
+                          <div className="col-md-6">
+                            <ElementButtonBar addElement={addElement} index={index} />
+                          </div>
+                        </div>
+
+
+
+
                       </div>
                     </div>
                 }

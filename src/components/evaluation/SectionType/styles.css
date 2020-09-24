@@ -9,9 +9,9 @@
 }
 
 .portlet-title:hover .btn-container{
-    display: inline-block;
+    display: block;
 }
 
 .controller-container:hover .btn-container{
-    display: inline-block;  
+    display: block;  
 }

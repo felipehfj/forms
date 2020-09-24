@@ -34,6 +34,7 @@
 .question-choice-container .question-choice-option-goto{    
     width: 30%;    
     vertical-align: middle;
+    margin-left: 2px;
 }
 
 .question-choice-container .question-btn-container{

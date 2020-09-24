@@ -9,6 +9,7 @@ import Modal from 'react-modal';
 import api from '../../services/api';
 import './styles.css';
 import { FormProvider } from '../Forms/FormContext';
+import FormThemeSelect from '../../components/general/FormThemeSelect';
 
 
 const modalThemeStyles = {
@@ -64,10 +65,10 @@ const Forms: React.FC<{}> = () => {
       });
   }
 
-  const addSection = () => {
+  const addSection = (index:number) => {
     setForm(form => produce(form, draft => {
       if (draft) {
-        draft.sections.push({ createdAt: new Date(), formElements: [], id: generate(), order: 0, ownerId: LoggedUser.userId, title: "", type: 'section', prevStep: '', nextStep: '' })
+        draft.sections.push({ createdAt: new Date(), formElements: [], id: generate(), order: 0, ownerId: LoggedUser.userId, title: "", type: 'section', navigation: 'nextSection' })
       }
     }))
   }
@@ -226,6 +227,8 @@ const Forms: React.FC<{}> = () => {
               contentLabel="Example Modal"
             >
               <div>
+<FormThemeSelect></FormThemeSelect>
+
                 <button type="button" className="btn" style={{ backgroundColor: 'red' }} onClick={() => { setForm(form => produce(form, draft => { if (draft) draft.theme = 'red' })) }}>Vermelho</button>
                 <button type="button" className="btn" style={{ backgroundColor: 'blue' }} onClick={() => { setForm(form => produce(form, draft => { if (draft) draft.theme = 'blue' })) }}>Azul</button>
                 <button type="button" className="btn" style={{ backgroundColor: 'green' }} onClick={() => { setForm(form => produce(form, draft => { if (draft) draft.theme = 'lightgreen' })) }}>Verde</button>

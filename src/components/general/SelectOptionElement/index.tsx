@@ -84,8 +84,7 @@ const SelectOptionElement: FC<SelectOptionElementProps> = ({children, optionElem
             value={option.navigation}
             className="form-control"
             setSelection={(e: any) => {
-              const {name, value} = e;
-              console.log(name, value)
+              const {name, value} = e;              
               setOption({...option, [name]: value})}
             }
             sections={sectionsSummary ? sectionsSummary : []} />            
