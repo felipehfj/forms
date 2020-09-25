@@ -8,8 +8,14 @@ const FormThemeSelect: FC = () => {
     return (
         <Fragment>
             <div className="row">
-                <div className="col-sm-2 col-md-2">
-                   <FormThemeUnit type='image' image={protruding_squares} />
+                <div className="col-sm-1 col-md-1">
+                   <FormThemeUnit image={protruding_squares} />
+                </div>     
+                <div className="col-sm-1 col-md-1">
+                   <FormThemeUnit image={protruding_squares} />
+                </div>     
+                <div className="col-sm-1 col-md-1">
+                   <FormThemeUnit image={protruding_squares} />
                 </div>                
             </div>
         </Fragment>

@@ -1,0 +1,12 @@
+.theme-unit-container{
+    display: block;
+}
+
+.theme-unit-container .image-block{
+    width: 100px;
+    height: 100px;         
+    margin-left: auto;
+    margin-right: auto;  
+    padding-top: 2px;
+}
+
