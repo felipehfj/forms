@@ -31,7 +31,7 @@ const FormThemeUnit: FC<FormThemeUnitProps> = ({ title = 'Laranja da Persia', co
                         :
                         <div
                             title={title}
-                            style={{ backgroundColor: color }}
+                            style={{ backgroundColor: color, width:100, height:100}}
                         />
                     }
                 </div>
