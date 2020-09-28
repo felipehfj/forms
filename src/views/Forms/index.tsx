@@ -10,6 +10,7 @@ import api from '../../services/api';
 import './styles.css';
 import { FormProvider } from '../Forms/FormContext';
 import FormThemeSelect from '../../components/general/FormThemeSelect';
+import { id } from 'date-fns/locale';
 
 
 const modalThemeStyles = {
@@ -26,14 +27,33 @@ const modalThemeStyles = {
 };
 
 const Forms: React.FC<{}> = () => {
-  const [form, setForm] = useState<EVALUATION.Form>();
+  const [form, setForm] = useState<EVALUATION.Form>(
+    {
+      id: generate(),
+      ownerId: LoggedUser.userId,
+      tipo: "survey",
+      theme: {
+        color: 'red',
+        image: '',
+        title:'dafault'
+      },
+      status: 'elaboration',
+      startAt: new Date(),
+      endAt: new Date(),
+      sections: [{ createdAt: new Date(), formElements: [], id: generate(), order: 0, ownerId: LoggedUser.userId, title: "", type: 'section', navigation: 'nextSection' }],
+      thanksMessage: 'string',
+      createdAt: new Date(),
+      isPublic: true,
+    }
+
+  );
   const [sectionsSummary, setSectionsSummary] = useState<Array<{ id: string, title: string }>>([])
-  useEffect(() => {
-    api.get('forms/aabbccddee')
-      .then(response => {
-        setForm(response.data.form[0])
-      })
-  }, [setForm])
+  // useEffect(() => {
+  //   api.get('forms/aabbccddee')
+  //     .then(response => {
+  //       setForm(response.data.form[0])
+  //     })
+  // }, [setForm])
 
   useEffect(() => {
     if (form) {
@@ -65,7 +85,7 @@ const Forms: React.FC<{}> = () => {
       });
   }
 
-  const addSection = (index:number) => {
+  const addSection = (index: number) => {
     setForm(form => produce(form, draft => {
       if (draft) {
         draft.sections.push({ createdAt: new Date(), formElements: [], id: generate(), order: 0, ownerId: LoggedUser.userId, title: "", type: 'section', navigation: 'nextSection' })
@@ -106,7 +126,13 @@ const Forms: React.FC<{}> = () => {
               </div>
             </div>
 
-            <div style={{ backgroundColor: form ? form.theme : '', width: '100%', height: 'calc(100vh - 40px)', overflowX: 'auto', paddingTop: 20 }} >
+            <div style={{ 
+              // backgroundColor: form.theme.color ? form.theme.color : '', 
+              backgroundImage: form.theme.image ? `url(${form.theme.image})`: '', 
+              width: '100%', 
+              height: 'calc(100vh - 40px)', 
+              overflowX: 'auto', 
+              paddingTop: 20 }} >
 
               {form && form.sections ? form.sections.map((item, index) => {
                 return (<div key={item.id}>
@@ -227,14 +253,18 @@ const Forms: React.FC<{}> = () => {
               contentLabel="Example Modal"
             >
               <div>
-<FormThemeSelect></FormThemeSelect>
+                <FormThemeSelect onSelect={(e:any) => {
 
-                <button type="button" className="btn" style={{ backgroundColor: 'red' }} onClick={() => { setForm(form => produce(form, draft => { if (draft) draft.theme = 'red' })) }}>Vermelho</button>
+                  setForm(form => produce(form, draft => { if (draft) draft.theme = {color: e.color, image: e.image, title: e.title} })) 
+                }} 
+                />
+
+                {/* <button type="button" className="btn" style={{ backgroundColor: 'red' }} onClick={() => { setForm(form => produce(form, draft => { if (draft) draft.theme = 'red' })) }}>Vermelho</button>
                 <button type="button" className="btn" style={{ backgroundColor: 'blue' }} onClick={() => { setForm(form => produce(form, draft => { if (draft) draft.theme = 'blue' })) }}>Azul</button>
                 <button type="button" className="btn" style={{ backgroundColor: 'green' }} onClick={() => { setForm(form => produce(form, draft => { if (draft) draft.theme = 'lightgreen' })) }}>Verde</button>
                 <button type="button" className="btn" style={{ backgroundColor: 'rgba(255,0,0,0.5)' }} onClick={() => { setForm(form => produce(form, draft => { if (draft) draft.theme = 'rgba(255,0,0,0.2)' })) }}>Vermelho Claro</button>
                 <button type="button" className="btn" style={{ backgroundColor: 'lightblue' }} onClick={() => { setForm(form => produce(form, draft => { if (draft) draft.theme = 'lightblue' })) }}>Azul claro</button>
-                <button type="button" className="btn" style={{ backgroundColor: 'lightgreen' }} onClick={() => { setForm(form => produce(form, draft => { if (draft) draft.theme = 'lightgreen' })) }}>Verde Claro</button>
+                <button type="button" className="btn" style={{ backgroundColor: 'lightgreen' }} onClick={() => { setForm(form => produce(form, draft => { if (draft) draft.theme = 'lightgreen' })) }}>Verde Claro</button> */}
               </div>
               <button type="button" className="btn btn-secondary" style={{ width: "100%" }} onClick={closeModal}>ok</button>
             </Modal>

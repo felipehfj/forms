@@ -98,11 +98,18 @@ export declare namespace EVALUATION {
     checked: boolean,
   }
 
+  interface FormThemeProps {
+    color?: string,
+    image?: string,
+    title?: string,
+    onSelect?: Function,
+  } 
+
   interface Form {
     id: string,
     ownerId: string,
     tipo: "survey" | "evaluation",
-    theme: string,
+    theme: FormThemeProps,
     status: 'elaboration' | 'active' | 'inactive',
     startAt?: Date,
     endAt?: Date,
@@ -112,4 +119,5 @@ export declare namespace EVALUATION {
     isPublic: boolean,
   }
 }
+
 

@@ -3,48 +3,41 @@ import FormThemeUnit from './FormThemeUnit';
 
 import './styles.css';
 import protruding_squares from '../../../assets/midia/backgrounds/Protruding-Squares.svg'
+import solidBlack from '../../../assets/midia/backgrounds/Solid_black.svg';
+import solidBlue from '../../../assets/midia/backgrounds/Solid_blue.svg';
+import solidOrange from '../../../assets/midia/backgrounds/Solid_orange.svg';
 
+interface FormThemeSelectProps{
+    onSelect:Function,
+}
 
-
-const FormThemeSelect: FC = () => {
-
+const FormThemeSelect: FC<FormThemeSelectProps> = ({onSelect}) => {    
     const themes = [
         {
-            color: '#89023e',
-            image: undefined,
-            title: 'Claret',
+            color: '#fff',
+            image: solidBlack,
+            title: 'Black',
         },
         {
-            color: '#ffd9da',
-            image: undefined,
-            title: 'Pale Pink',
+            color: '#00f',
+            image: solidBlue,
+            title: 'Blue',
         },
         {
-            color: '#9ea3b0',
-            image: undefined,
-            title: 'Manatee',
-        },
+            color: '#f90',
+            image: solidOrange,
+            title: 'Orange Juice',
+        },    
         {
-            color: '#e4c3ad',
-            image: undefined,
-            title: 'Desert Sand',
-        },
-        {
-            color: '#9ea3b0',
-            image: undefined,
-            title: 'Manatee',
-        },
-        {
-            color: '#9ea3b0',
-            image: undefined,
-            title: 'Manatee',
-        },
-        {
-            color: '#9ea3b0',
-            image: undefined,
-            title: 'Manatee',
-        },
+            color: '#ee5522',
+            image: protruding_squares,
+            title: 'Pot Orange Juice',
+        },        
     ]
+
+    const handleSelect = (e:any) =>{        
+        onSelect(e)
+    }
     return (
         <Fragment>
             <div className="row">
@@ -55,14 +48,11 @@ const FormThemeSelect: FC = () => {
                                 color={theme.color}
                                 image={theme.image}
                                 title={theme.title}
+                                onSelect={() => handleSelect(theme)}
                             />
                         </div>
                     )
                 }
-
-                <div className="col-md-2">
-                    <FormThemeUnit image={protruding_squares} />
-                </div>
             </div>
         </Fragment>
     );
