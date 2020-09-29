@@ -99,9 +99,11 @@ export declare namespace EVALUATION {
   }
 
   interface FormThemeProps {
-    color?: string,
-    image?: string,
-    title?: string,
+    id: string,
+    primaryColor: string,
+    secondaryColor: string,
+    image: string,
+    title: string,
     onSelect?: Function,
   } 
 
