@@ -4,7 +4,8 @@ import './styles.css';
 
 const Home: FC = () => {
     return (<Fragment>
-        <Link to="/forms">Forms</Link>
+        <Link to="/formlist">Forms</Link>
+        <Link to="/forms">Form</Link>
         <Link to="/Home">Home</Link>
     </Fragment>);
 }

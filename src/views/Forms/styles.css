@@ -7,6 +7,12 @@
     background-color: #EFEFEF
 }
 
+.configuration-container .back-button-bar{
+    align-content: center;
+    float: left;
+    margin-left: 10px;
+}
+
 .configuration-container .button-bar{
     align-content: center;
 

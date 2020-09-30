@@ -26,7 +26,7 @@ const FormThemeSelect: FC<FormThemeSelectProps> = ({ onSelect }) => {
                 <div className="row">
                     {
                         themes.map(theme =>
-                            <div key={theme.title} className="col-md-1" style={{marginBottom:10}}>
+                            <div key={theme.title} className="col-md-2" style={{marginBottom:10}}>
                                 <FormThemeUnit
                                     primaryColor={theme.primaryColor}
                                     secondaryColor={theme.secondaryColor}

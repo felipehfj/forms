@@ -1,16 +1,16 @@
 import React, { Fragment, useEffect, useState } from 'react';
+import { Link, useHistory, useParams } from 'react-router-dom';
 import SectionType from '../../components/evaluation/SectionType';
 import { generate } from 'shortid';
 import LoggedUser from '../../components/general/LoggedUser';
 import { EVALUATION } from '../../interfaces/elements';
-import { FaPalette, FaEllipsisH, FaSave } from 'react-icons/fa';
+import { FaPalette, FaEllipsisH, FaSave, FaArrowLeft } from 'react-icons/fa';
 import produce from 'immer';
 import Modal from 'react-modal';
 import api from '../../services/api';
 import './styles.css';
 import { FormProvider } from '../Forms/FormContext';
 import FormThemeSelect from '../../components/general/FormThemeSelect';
-import { id } from 'date-fns/locale';
 
 
 const modalThemeStyles = {
@@ -22,39 +22,28 @@ const modalThemeStyles = {
     marginRight: '-50%',
     transform: 'translate(-50%, -50%)',
     minWidth: '80vw',
-    height: '300px',    
+    height: '300px',
   }
 };
 
+interface RouteParams {
+  id: string
+}
+
 const Forms: React.FC<{}> = () => {
+  const { id } = useParams<RouteParams>();
+  const params = useParams();
   const BG_THEME_URL = process.env.REACT_APP_BG_THEME_URL;
+  const history = useHistory();
 
-  const [form, setForm] = useState<EVALUATION.Form>(
-    // {
-    //   id: generate(),
-    //   ownerId: LoggedUser.userId,
-    //   tipo: "survey",
-    //   theme: {
-    //     color: 'red',
-    //     image: '',
-    //     title:'dafault'
-    //   },
-    //   status: 'elaboration',
-    //   startAt: new Date(),
-    //   endAt: new Date(),
-    //   sections: [{ createdAt: new Date(), formElements: [], id: generate(), order: 0, ownerId: LoggedUser.userId, title: "", type: 'section', navigation: 'nextSection' }],
-    //   thanksMessage: 'string',
-    //   createdAt: new Date(),
-    //   isPublic: true,
-    // }
-
-  );
+  const [form, setForm] = useState<EVALUATION.Form>();
   const [sectionsSummary, setSectionsSummary] = useState<Array<{ id: string, title: string }>>([])
   useEffect(() => {
-    api.get('forms/aabbccddee')
+    api.get(`forms/${id}`)
       .then(response => {
         setForm(response.data)
       })
+    console.log(params)
   }, [setForm])
 
   useEffect(() => {
@@ -81,7 +70,7 @@ const Forms: React.FC<{}> = () => {
   }
 
   const updateRemote = () => {
-    api.put('forms/aabbccddee', form)
+    api.put(`forms/${id}`, form)
       .then(response => {
         console.log(response);
       });
@@ -115,12 +104,17 @@ const Forms: React.FC<{}> = () => {
     }
   }
 
+
+
   return (
     <Fragment>
       {form ?
         <div>
           <FormProvider value={{ form, sectionsSummary }}>
             <div className="configuration-container">
+              <div className="back-button-bar">
+                <button type='button' className="btn btn-icon"  onClick={()=>{ history.push('/formlist')}}><FaArrowLeft color='#000' /> Voltar</button>                
+              </div>
               <div className="button-bar">
                 <button type='button' className="btn btn-icon" onClick={() => showModal()}><FaPalette /> Temas</button>
                 <button type='button' className="btn btn-icon" onClick={() => { updateRemote() }}><FaSave /> Salvar</button>
@@ -255,12 +249,12 @@ const Forms: React.FC<{}> = () => {
               style={modalThemeStyles}
               contentLabel="Example Modal"
             >
-              <div style={{overflow:'auto'}}>
+              <div>
                 <FormThemeSelect onSelect={(e: any) => {
 
                   setForm(form => produce(form, draft => { if (draft) draft.theme = { id: e.id, primaryColor: e.primaryColor, secondaryColor: e.secondaryColor, image: e.image, title: e.title } }))
                 }}
-                />             
+                />
               </div>
               <button type="button" className="btn btn-secondary" style={{ width: "100%" }} onClick={closeModal}>ok</button>
             </Modal>
